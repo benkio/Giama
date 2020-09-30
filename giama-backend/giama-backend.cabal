@@ -1,0 +1,76 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: fa36b680dcce2d46e8d779ce0eb8baaa13566917d5853b8cc1436cd348f213ab
+
+name:           giama-backend
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/giama-backend#readme>
+homepage:       https://github.com/githubuser/giama-backend#readme
+bug-reports:    https://github.com/githubuser/giama-backend/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/giama-backend
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_giama_backend
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , servant-server
+    , wai
+    , warp
+  default-language: Haskell2010
+
+executable giama-backend-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_giama_backend
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base
+    , giama-backend
+    , servant-server
+    , wai
+    , warp
+  default-language: Haskell2010
+
+test-suite giama-backend-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_giama_backend
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base
+    , giama-backend
+    , hspec
+    , hspec-wai
+    , hspec-wai-json
+    , servant-server
+    , wai
+    , warp
+  default-language: Haskell2010
