@@ -1,4 +1,4 @@
-module Domain.Project (Project(..), ProjectName, appendScene, removeScene) where
+module Domain.Project (Project(..), ProjectName, appendScene, removeScene, moveScene, insertScene) where
 
 import           Data.Either.Combinators (maybeToRight)
 import           Data.List               (find)
@@ -24,5 +24,16 @@ removeScene s p = do
   let newScenes = previousScenes ++ fmap (sceneAddPosition (-1)) (tail nextScenes)
   return $ p { projectScenes = newScenes }
 
+insertScene :: Scene -> Int -> Project -> Project
+insertScene s i p =
+  let currentScenes = projectScenes p
+      (previousScenes, nextScenes) = splitAt i currentScenes
+      newScenes = previousScenes ++ [s { scenePosition = i }] ++ fmap (sceneAddPosition 1) nextScenes
+  in p { projectScenes = newScenes }
+
+
 moveScene :: SceneName -> Int -> Project -> Either DomainError Project
-moveScene s i p = undefined
+moveScene s i p = do
+  sceneToMove <- maybeToRight (SceneNotFound s) $ find (\x -> sceneName x == s) (projectScenes p)
+  newProject <- removeScene (sceneName sceneToMove) p
+  return $ insertScene sceneToMove i newProject
