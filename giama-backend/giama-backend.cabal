@@ -4,16 +4,16 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fa36b680dcce2d46e8d779ce0eb8baaa13566917d5853b8cc1436cd348f213ab
+-- hash: ed2d62f97cf82e81c94d1295a29e5b436372b33dd66d6b39c035d945439a5c57
 
 name:           giama-backend
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/giama-backend#readme>
+description:    Please see the README on GitHub at <https://github.com/benkio/giama-backend#readme>
 homepage:       https://github.com/githubuser/giama-backend#readme
 bug-reports:    https://github.com/githubuser/giama-backend/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2020 Author name here
+author:         Enrico Benini
+maintainer:     benkio89@gmail.com
+copyright:      2020 Enrico Benini
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -26,7 +26,16 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Domain.Act
+      Domain.Identifiers
+      Domain.Project
+      Domain.Scene
+      Persistence.FileSystem.Classes
+      Persistence.FileSystem.Config
+      Persistence.FileSystem.Exception
+      Persistence.FileSystem.Project
+      UI.Api.App
+      UI.Shell.App
   other-modules:
       Paths_giama_backend
   hs-source-dirs:
@@ -34,21 +43,45 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , directory
+    , filepath
     , servant-server
     , wai
     , warp
   default-language: Haskell2010
 
-executable giama-backend-exe
-  main-is: Main.hs
+executable giama-backend-Api-exe
+  main-is: ApiMain.hs
   other-modules:
+      ShellMain
       Paths_giama_backend
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is ApiMain
   build-depends:
       aeson
     , base
+    , directory
+    , filepath
+    , giama-backend
+    , servant-server
+    , wai
+    , warp
+  default-language: Haskell2010
+
+executable giama-backend-Shell-exe
+  main-is: ShellMain.hs
+  other-modules:
+      ApiMain
+      Paths_giama_backend
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is ShellMain
+  build-depends:
+      aeson
+    , base
+    , directory
+    , filepath
     , giama-backend
     , servant-server
     , wai
@@ -66,6 +99,8 @@ test-suite giama-backend-test
   build-depends:
       aeson
     , base
+    , directory
+    , filepath
     , giama-backend
     , hspec
     , hspec-wai

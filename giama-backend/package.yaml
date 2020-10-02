@@ -2,9 +2,9 @@ name:                giama-backend
 version:             0.1.0.0
 github:              "githubuser/giama-backend"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2020 Author name here"
+author:              "Enrico Benini"
+maintainer:          "benkio89@gmail.com"
+copyright:           "2020 Enrico Benini"
 
 extra-source-files:
 - README.md
@@ -16,7 +16,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/giama-backend#readme>
+description:         Please see the README on GitHub at <https://github.com/benkio/giama-backend#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -24,22 +24,38 @@ dependencies:
 - servant-server
 - wai
 - warp
+- directory
+- filepath
+#- transformers
 
 library:
   source-dirs: src
 
 executables:
-  giama-backend-exe:
-    main:                Main.hs
+  giama-backend-Api-exe:
+    main:                ApiMain.hs
     source-dirs:         app
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -main-is ApiMain
+    dependencies:
+    - base
+    - giama-backend
+  giama-backend-Shell-exe:
+    main:                ShellMain.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -main-is ShellMain
     dependencies:
     - base
     - giama-backend
 
+    
 tests:
   giama-backend-test:
     main:                Spec.hs
