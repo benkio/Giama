@@ -7,4 +7,4 @@ data Act = Act {
   ,actParentSceneName  :: SceneName
   ,actName             :: ActName
   ,actContent          :: String
-  }
+  } deriving (Show)

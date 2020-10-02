@@ -7,4 +7,4 @@ data Scene = Scene {
   sceneParentProjectName :: ProjectName
   ,sceneName             :: SceneName
   ,sceneActs             :: [Act]
-  }
+  } deriving (Show)

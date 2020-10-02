@@ -6,8 +6,4 @@ import           Domain.Scene       (Scene)
 data Project = Project {
     projectName   :: ProjectName
   , projectScenes :: [Scene]
-  }
-
-
-
-
+  } deriving (Show)
