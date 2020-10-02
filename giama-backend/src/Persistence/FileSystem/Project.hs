@@ -7,8 +7,11 @@ import           Persistence.FileSystem.Config (rootPath)
 import           System.Directory              (createDirectory)
 import           System.FilePath
 
+createDirWithResult :: a -> FilePath -> IO (Either SomeException a)
+createDirWithResult x = fmap (fmap (const x)) . try . createDirectory
+
 createProject :: Project -> IO (Either SomeException Project)
-createProject p = (fmap (fmap (const p)) . try . createDirectory) $ rootPath </> projectName p
+createProject p =  createDirWithResult p $ rootPath </> projectName p
 
 addSceneToProject :: Project -> Scene -> IO (Either SomeException Project)
-addSceneToProject = undefined
+addSceneToProject p s = undefined

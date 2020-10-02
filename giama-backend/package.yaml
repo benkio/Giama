@@ -26,6 +26,7 @@ dependencies:
 - warp
 - directory
 - filepath
+- either
 #- transformers
 
 library:

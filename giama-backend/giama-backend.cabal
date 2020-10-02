@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ed2d62f97cf82e81c94d1295a29e5b436372b33dd66d6b39c035d945439a5c57
+-- hash: 2844ccc945abde12b75caa6fdd6ee9db23432093dc39412ea1c1991145db759c
 
 name:           giama-backend
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 library
   exposed-modules:
       Domain.Act
+      Domain.Errors
       Domain.Identifiers
       Domain.Project
       Domain.Scene
@@ -44,6 +45,7 @@ library
       aeson
     , base >=4.7 && <5
     , directory
+    , either
     , filepath
     , servant-server
     , wai
@@ -62,6 +64,7 @@ executable giama-backend-Api-exe
       aeson
     , base
     , directory
+    , either
     , filepath
     , giama-backend
     , servant-server
@@ -81,6 +84,7 @@ executable giama-backend-Shell-exe
       aeson
     , base
     , directory
+    , either
     , filepath
     , giama-backend
     , servant-server
@@ -100,6 +104,7 @@ test-suite giama-backend-test
       aeson
     , base
     , directory
+    , either
     , filepath
     , giama-backend
     , hspec

@@ -25,9 +25,9 @@ instance HasFilePath Project where
 instance HasFilePath Scene where
   getFilePath s = do
     projectFilePath <- searchFilePathByName (sceneParentProjectName s) rootPath
-    join <$> traverse (searchFilePathByName (sceneName s)) projectFilePath
+    join <$> traverse (searchFilePathByName (show (scenePosition s) ++ "_" ++ sceneName s)) projectFilePath
 
 instance HasFilePath Act where
   getFilePath a = do
     sceneFilePath <- searchFilePathByName (actParentSceneName a) rootPath
-    join <$> traverse (searchFilePathByName (actName a)) sceneFilePath
+    join <$> traverse (searchFilePathByName (show (actPosition a) ++ "_" ++ actName a)) sceneFilePath
