@@ -1,17 +1,36 @@
-module Persistence.FileSystem.Project(createProject) where
+module Persistence.FileSystem.Project(createProject, loadProjects) where
 
-import           Control.Exception             (SomeException, try)
-import           Domain.Project                (Project (..))
-import           Domain.Scene                  (Scene (..))
-import           Persistence.FileSystem.Config (rootPath)
-import           System.Directory              (createDirectory)
-import           System.FilePath
+import           Persistence.FileSystem.Config             (rootPath)
 
-createDirWithResult :: a -> FilePath -> IO (Either SomeException a)
-createDirWithResult x = fmap (fmap (const x)) . try . createDirectory
+import           Control.Exception                         (Exception)
+import           Control.Monad.Trans.Except                (ExceptT (..),
+                                                            runExceptT)
+import           Domain.Project                            (Project (..))
+import           Persistence.FileSystem.Classes            (HasFilePath (..))
+import           Persistence.FileSystem.DirectoryFunctions (applyDirWithResult)
+import           Persistence.FileSystem.Scene              (createScene,
+                                                            loadScenes)
+import           System.Directory                          (createDirectory,
+                                                            listDirectory,
+                                                            removeDirectory)
 
-createProject :: Project -> IO (Either SomeException Project)
-createProject p =  createDirWithResult p $ rootPath </> projectName p
+removeProject :: Exception e => Project -> IO (Either e Project)
+removeProject p = applyDirWithResult p removeDirectory (getFilePath p)
 
-addSceneToProject :: Project -> Scene -> IO (Either SomeException Project)
-addSceneToProject p s = undefined
+createProject :: Exception e => Project -> IO (Either e Project)
+createProject p = runExceptT $
+  do
+    let projectPath = getFilePath p
+    project <- ExceptT $ applyDirWithResult p createDirectory projectPath
+    scenes <- ExceptT $ sequence <$> traverse createScene (projectScenes p)
+    return $ project { projectScenes = scenes }
+
+-- load projects from dir
+
+loadProjects :: IO [Project]
+loadProjects = do
+  projectFilePaths <- listDirectory rootPath
+  traverse (\p -> loadScenes (Project { projectName = p, projectScenes = [] })) projectFilePaths
+
+-- appendSceneToProject :: Project -> Scene -> IO (Either SomeException Project)
+-- appendSceneToProject p s = undefined

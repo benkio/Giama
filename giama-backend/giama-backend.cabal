@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2844ccc945abde12b75caa6fdd6ee9db23432093dc39412ea1c1991145db759c
+-- hash: 3a76c02aa1e11d3ab15cdac63f4186b23294d677db3a2927ac552a9dbf96369e
 
 name:           giama-backend
 version:        0.1.0.0
@@ -31,10 +31,12 @@ library
       Domain.Identifiers
       Domain.Project
       Domain.Scene
+      Persistence.FileSystem.Act
       Persistence.FileSystem.Classes
       Persistence.FileSystem.Config
-      Persistence.FileSystem.Exception
+      Persistence.FileSystem.DirectoryFunctions
       Persistence.FileSystem.Project
+      Persistence.FileSystem.Scene
       UI.Api.App
       UI.Shell.App
   other-modules:
@@ -48,6 +50,7 @@ library
     , either
     , filepath
     , servant-server
+    , transformers
     , wai
     , warp
   default-language: Haskell2010
@@ -59,7 +62,7 @@ executable giama-backend-Api-exe
       Paths_giama_backend
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is ApiMain
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -main-is ApiMain
   build-depends:
       aeson
     , base
@@ -68,6 +71,7 @@ executable giama-backend-Api-exe
     , filepath
     , giama-backend
     , servant-server
+    , transformers
     , wai
     , warp
   default-language: Haskell2010
@@ -79,7 +83,7 @@ executable giama-backend-Shell-exe
       Paths_giama_backend
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is ShellMain
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -main-is ShellMain
   build-depends:
       aeson
     , base
@@ -88,6 +92,7 @@ executable giama-backend-Shell-exe
     , filepath
     , giama-backend
     , servant-server
+    , transformers
     , wai
     , warp
   default-language: Haskell2010
@@ -99,7 +104,7 @@ test-suite giama-backend-test
       Paths_giama_backend
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -Wall -with-rtsopts=-N
   build-depends:
       aeson
     , base
@@ -111,6 +116,7 @@ test-suite giama-backend-test
     , hspec-wai
     , hspec-wai-json
     , servant-server
+    , transformers
     , wai
     , warp
   default-language: Haskell2010

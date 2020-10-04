@@ -1,33 +1,23 @@
 module Persistence.FileSystem.Classes (HasFilePath(..)) where
 
-import           Control.Monad                 (join)
-import           Data.List                     (find)
-import           Domain.Act
-import           Domain.Identifiers            (ActName, ProjectName, SceneName)
-import           Domain.Project
-import           Domain.Scene
+import           Domain.Act                    (Act (..))
+import           Domain.Project                (Project (..))
+import           Domain.Scene                  (Scene (..))
 import           Persistence.FileSystem.Config (rootPath)
-import           System.Directory              (listDirectory)
-import           System.FilePath
-import           System.IO
+import           System.FilePath               ((<.>), (</>))
 
 class HasFilePath a where
-  getFilePath :: a -> IO (Maybe FilePath)
-
-searchFilePathByName :: String -> FilePath ->  IO (Maybe FilePath)
-searchFilePathByName name dir = do
-    filePaths <- listDirectory dir
-    return $ find (\fp -> name == takeFileName fp) filePaths
+  getFilePath :: a -> FilePath
 
 instance HasFilePath Project where
-  getFilePath p = searchFilePathByName (projectName p) rootPath
+  getFilePath p = rootPath </> projectName p
 
 instance HasFilePath Scene where
-  getFilePath s = do
-    projectFilePath <- searchFilePathByName (sceneParentProjectName s) rootPath
-    join <$> traverse (searchFilePathByName (show (scenePosition s) ++ "_" ++ sceneName s)) projectFilePath
+  getFilePath s =
+    rootPath </> sceneParentProjectName s </>
+    (show (scenePosition s) ++ "_" ++ sceneName s)
 
 instance HasFilePath Act where
-  getFilePath a = do
-    sceneFilePath <- searchFilePathByName (actParentSceneName a) rootPath
-    join <$> traverse (searchFilePathByName (show (actPosition a) ++ "_" ++ actName a)) sceneFilePath
+  getFilePath a =
+    rootPath </> actParentProjectName a </> actParentSceneName a </>
+    (show (actPosition a) ++ "_" ++ actName a <.> "txt")

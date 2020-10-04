@@ -27,7 +27,7 @@ dependencies:
 - directory
 - filepath
 - either
-#- transformers
+- transformers
 
 library:
   source-dirs: src
@@ -40,6 +40,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
     - -main-is ApiMain
     dependencies:
     - base
@@ -51,6 +52,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
     - -main-is ShellMain
     dependencies:
     - base
@@ -64,6 +66,7 @@ tests:
     ghc-options:
     - -threaded
     - -rtsopts
+    - -Wall
     - -with-rtsopts=-N
     dependencies:
     - base

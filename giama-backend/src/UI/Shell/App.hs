@@ -1,22 +1,34 @@
 module UI.Shell.App (app) where
 
-import           Domain.Project (Project (..), appendScene, insertScene,
-                                 moveScene, removeScene)
-import           Domain.Scene   (Scene (..))
--- import           Persistence.FileSystem.Project (createProject)
+import           Domain.Act                     (Act (..))
+import           Domain.Project                 (Project (..))
+import           Domain.Scene                   (Scene (..))
+import           Persistence.FileSystem.Project (createProject, loadProjects)
 
 app :: IO ()
 app = do
-  let p = Project { projectName = "Izi Project", projectScenes = []}
-  let s = Scene { sceneParentProjectName = "Izi Project" ,scenePosition = 1 ,sceneName = "Scene A" ,sceneActs = [] }
-  let s' = Scene { sceneParentProjectName = "Izi Project" ,scenePosition = 10 ,sceneName = "Scene B" ,sceneActs = [] }
-  let s'' = Scene { sceneParentProjectName = "Izi Project" ,scenePosition = 10 ,sceneName = "Scene C" ,sceneActs = [] }
-  let p' = appendScene s p
-  print $ "p1 - " ++ show p'
-  let p'' = appendScene s' p'
-  print $ "p2 - " ++ show p''
-  let p''' = insertScene s'' 1 p''
-  print p'''
-  let p'''' = moveScene (sceneName s'') 0 p'''
-  print p''''
+  --createProject p
+  x <- loadProjects -- p
+  print x
   return ()
+
+
+s = Scene { sceneParentProjectName = "Izi Project" ,scenePosition = 0,sceneName = "Scene A" ,sceneActs = [a] }
+s' = Scene { sceneParentProjectName = "Izi Project" ,scenePosition = 1  ,sceneName = "Scene B" ,sceneActs = [] }
+s'' = Scene { sceneParentProjectName = "Izi Project" ,scenePosition = 2  ,sceneName = "Scene C" ,sceneActs = [a'] }
+a = Act {
+  actParentProjectName = "Izi Project"
+  ,actParentSceneName  = "0_Scene A"
+  ,actPosition         = 0
+  ,actName             = "First Act - Scene A"
+  ,actContent          = "FAGIO GAY"
+        }
+a' = Act {
+  actParentProjectName = "Izi Project"
+  ,actParentSceneName  = "2_Scene C"
+  ,actPosition         = 0
+  ,actName             = "First Act - Scene C"
+  ,actContent          = "FAGIO GAY FOREVER AFTER! <3"
+        }
+
+p = Project { projectName = "Izi Project", projectScenes = [s, s', s'']}
