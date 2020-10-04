@@ -7,7 +7,7 @@ import           Domain.Scene                              (Scene (..))
 import           Persistence.FileSystem.Classes            (HasFilePath (..))
 import           Persistence.FileSystem.DirectoryFunctions (applyDirWithResult)
 import           System.Directory                          (listDirectory)
-import           System.FilePath                           ((</>))
+import           System.FilePath                           ((</>), takeBaseName)
 
 createAct :: Exception e => Act -> IO (Either e Act)
 createAct a = do
@@ -21,7 +21,7 @@ loadActs s = do
   acts <- traverse (\a ->
                           do
                             ac <- readFile $ getFilePath s </> a
-                            let (ap, an) = span (/= '_') a
+                            let (ap, an) = span (/= '_') $ takeBaseName a
                             return (Act {
                                        actParentProjectName = sceneParentProjectName s
                                        ,actParentSceneName  = sceneName s
