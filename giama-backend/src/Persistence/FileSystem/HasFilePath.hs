@@ -1,4 +1,4 @@
-module Persistence.FileSystem.Classes (HasFilePath(..)) where
+module Persistence.FileSystem.HasFilePath (HasFilePath(..)) where
 
 import           Domain.Act                    (Act (..))
 import           Domain.Project                (Project (..))

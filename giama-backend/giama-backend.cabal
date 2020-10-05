@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3a76c02aa1e11d3ab15cdac63f4186b23294d677db3a2927ac552a9dbf96369e
+-- hash: d91bcad1a0db7194bcc9d6f87e82ea4245a35132b299e8e158e0c360867410fb
 
 name:           giama-backend
 version:        0.1.0.0
@@ -31,12 +31,12 @@ library
       Domain.Identifiers
       Domain.Project
       Domain.Scene
-      Persistence.FileSystem.Act
-      Persistence.FileSystem.Classes
       Persistence.FileSystem.Config
+      Persistence.FileSystem.Createable
       Persistence.FileSystem.DirectoryFunctions
-      Persistence.FileSystem.Project
-      Persistence.FileSystem.Scene
+      Persistence.FileSystem.HasFilePath
+      Persistence.FileSystem.Loadable
+      Persistence.FileSystem.Removable
       UI.Api.App
       UI.Shell.App
   other-modules:

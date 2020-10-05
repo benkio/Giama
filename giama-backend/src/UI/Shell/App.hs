@@ -3,7 +3,7 @@ module UI.Shell.App (app) where
 import           Domain.Act                     (Act (..))
 import           Domain.Project                 (Project (..))
 import           Domain.Scene                   (Scene (..))
-import           Persistence.FileSystem.Project (createProject, loadProjects)
+import           Persistence.FileSystem.Loadable (loadProjects)
 
 app :: IO ()
 app = do
