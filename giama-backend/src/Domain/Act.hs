@@ -8,4 +8,13 @@ data Act = Act {
   ,actPosition         :: Int
   ,actName             :: ActName
   ,actContent          :: String
-  } deriving (Show)
+  }
+
+instance Show Act where
+  show (Act{
+         actParentProjectName = appn
+         ,actParentSceneName  = apsn
+         ,actPosition         = ap
+         ,actName             = an
+         }) =
+      "       |- (" ++ appn ++ " - " ++ apsn ++ ") - " ++ show ap ++ " " ++ an

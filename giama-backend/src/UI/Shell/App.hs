@@ -1,15 +1,15 @@
 module UI.Shell.App (app) where
 
-import           Domain.Act                     (Act (..))
-import           Domain.Project                 (Project (..))
-import           Domain.Scene                   (Scene (..))
+import           Domain.Act                      (Act (..))
+import           Domain.Project                  (Project (..), showProjects)
+import           Domain.Scene                    (Scene (..))
 import           Persistence.FileSystem.Loadable (loadProjects)
 
 app :: IO ()
 app = do
   --createProject p
   x <- loadProjects -- p
-  print x
+  putStrLn $ showProjects x
   return ()
 
 
@@ -20,14 +20,14 @@ a = Act {
   actParentProjectName = "Izi Project"
   ,actParentSceneName  = "0_Scene A"
   ,actPosition         = 0
-  ,actName             = "First Act - Scene A"
+  ,actName             = "First Act"
   ,actContent          = "FAGIO GAY"
         }
 a' = Act {
   actParentProjectName = "Izi Project"
   ,actParentSceneName  = "2_Scene C"
   ,actPosition         = 0
-  ,actName             = "First Act - Scene C"
+  ,actName             = "First Act"
   ,actContent          = "FAGIO GAY FOREVER AFTER! <3"
         }
 

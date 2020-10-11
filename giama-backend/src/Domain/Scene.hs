@@ -8,9 +8,17 @@ data Scene = Scene {
   ,scenePosition         :: Int
   ,sceneName             :: SceneName
   ,sceneActs             :: [Act]
-  } deriving (Show)
+  }
 
 sceneAddPosition :: Int -> Scene -> Scene
 sceneAddPosition x s = let currentPosition = scenePosition s
                            newPosition = currentPosition + x
                        in s { scenePosition = newPosition }
+
+instance Show Scene where
+  show (Scene{
+           sceneParentProjectName = sppn
+           ,scenePosition         = sp
+           ,sceneName             = sn
+           ,sceneActs             = as}) =
+    "  |- (" ++ sppn ++ ") - " ++ show sp ++ " " ++ sn ++ foldl (\acc a -> acc ++ "\n" ++ show a) "" as
