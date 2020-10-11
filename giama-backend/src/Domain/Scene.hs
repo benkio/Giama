@@ -16,9 +16,9 @@ sceneAddPosition x s = let currentPosition = scenePosition s
                        in s { scenePosition = newPosition }
 
 instance Show Scene where
-  show (Scene{
+  show Scene{
            sceneParentProjectName = sppn
            ,scenePosition         = sp
            ,sceneName             = sn
-           ,sceneActs             = as}) =
+           ,sceneActs             = as} =
     "  |- (" ++ sppn ++ ") - " ++ show sp ++ " " ++ sn ++ foldl (\acc a -> acc ++ "\n" ++ show a) "" as

@@ -11,10 +11,10 @@ data Act = Act {
   }
 
 instance Show Act where
-  show (Act{
+  show Act{
          actParentProjectName = appn
          ,actParentSceneName  = apsn
          ,actPosition         = ap
          ,actName             = an
-         }) =
+         } =
       "       |- (" ++ appn ++ " - " ++ apsn ++ ") - " ++ show ap ++ " " ++ an
