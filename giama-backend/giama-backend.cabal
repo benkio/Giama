@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d107a1c24787b809b7cbdfc1da9c7b2e806cb50017ce35a2ae742aae478701a2
+-- hash: 00681fa5618153cdccb31c95af838a5b57b2ccedbebea4e26a3d3967294c7c9a
 
 name:           giama-backend
 version:        0.1.0.0
@@ -27,9 +27,13 @@ source-repository head
 library
   exposed-modules:
       Domain.Act
+      Domain.HasModifiedDate
+      Domain.HasName
       Domain.Identifiers
       Domain.Project
       Domain.Scene
+      Domain.Search
+      Domain.Sort
       Persistence.FileSystem.Config
       Persistence.FileSystem.Createable
       Persistence.FileSystem.DirectoryFunctions
@@ -46,9 +50,9 @@ library
       aeson
     , base >=4.7 && <5
     , directory
-    , either
     , filepath
     , servant-server
+    , time
     , transformers
     , wai
     , warp
@@ -66,10 +70,10 @@ executable giama-backend-Api-exe
       aeson
     , base
     , directory
-    , either
     , filepath
     , giama-backend
     , servant-server
+    , time
     , transformers
     , wai
     , warp
@@ -87,10 +91,10 @@ executable giama-backend-Shell-exe
       aeson
     , base
     , directory
-    , either
     , filepath
     , giama-backend
     , servant-server
+    , time
     , transformers
     , wai
     , warp
@@ -108,13 +112,13 @@ test-suite giama-backend-test
       aeson
     , base
     , directory
-    , either
     , filepath
     , giama-backend
     , hspec
     , hspec-wai
     , hspec-wai-json
     , servant-server
+    , time
     , transformers
     , wai
     , warp

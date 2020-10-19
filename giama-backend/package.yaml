@@ -26,8 +26,8 @@ dependencies:
 - warp
 - directory
 - filepath
-- either
 - transformers
+- time
 
 library:
   source-dirs: src

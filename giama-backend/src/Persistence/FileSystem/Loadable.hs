@@ -6,7 +6,8 @@ import           Domain.Project                     (Project (..))
 import           Domain.Scene                       (Scene (..))
 import           Persistence.FileSystem.Config      (rootPath)
 import           Persistence.FileSystem.HasFilePath (HasFilePath (..))
-import           System.Directory                   (listDirectory)
+import           System.Directory                   (getModificationTime,
+                                                     listDirectory)
 import           System.FilePath                    (takeBaseName, (</>))
 
 loadPattern :: HasFilePath a => (a -> FilePath -> IO b) -> ([b] -> a -> a) -> a -> IO a
@@ -21,29 +22,34 @@ class HasFilePath a => Loadable a where
 
 instance Loadable Project where
   load p = loadPattern (\x s->
-                          let (sp, sn) = span (/= '_') s
-                          in
-                            load (Scene {
-                                     sceneParentProjectName = projectName x
-                                     ,scenePosition         = read sp :: Int
-                                     ,sceneName             = tail sn
-                                     ,sceneActs             = []         })) (\ss x -> x { projectScenes = sortOn scenePosition ss}) p
+                           do
+                             let (sp, sn) = span (/= '_') s
+                             print x
+                             modifiedDate <- getModificationTime s
+                             load (Scene {
+                                      sceneParentProjectName = projectName x
+                                      , sceneModifiedDate = modifiedDate
+                                      ,scenePosition         = read sp :: Int
+                                      ,sceneName             = tail sn
+                                      ,sceneActs             = []         })) (\ss x -> x { projectScenes = sortOn scenePosition ss}) p
 
 
 instance Loadable Scene where
   load s = loadPattern (\x a->
           do
             ac <- readFile $ getFilePath x </> a
+            modifiedDate <- getModificationTime a
             let (ap, an) = span (/= '_') $ takeBaseName a
             return (Act {
-                       actParentProjectName = sceneParentProjectName x
-                       ,actParentSceneName  = sceneName x
-                       ,actPosition         = read ap :: Int
-                       ,actName             = tail an
-                       ,actContent          = ac
+                       actParentProjectName  = sceneParentProjectName x
+                       , actParentSceneName  = sceneName x
+                       , actModifiedDate     = modifiedDate
+                       , actPosition         = read ap :: Int
+                       , actName             = tail an
+                       , actContent          = ac
                        })) (\as x -> x { sceneActs = sortOn actPosition as}) s
 
 loadProjects :: IO [Project]
 loadProjects = do
   projectFilePaths <- listDirectory rootPath
-  traverse (\p -> load (Project { projectName = p, projectScenes = [] })) projectFilePaths
+  traverse (\p -> getModificationTime p >>= \md -> load (Project { projectName = p, projectModifiedDate = md, projectScenes = [] })) projectFilePaths
