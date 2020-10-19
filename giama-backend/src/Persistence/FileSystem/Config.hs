@@ -1,4 +1,6 @@
 module Persistence.FileSystem.Config (rootPath) where
 
-rootPath :: FilePath
-rootPath = "/home/benkio/temp/giamaProjects/"
+import           System.Path (Absolute, Path, fromAbsoluteFilePath)
+
+rootPath :: Path Absolute
+rootPath = fromAbsoluteFilePath "/home/benkio/temp/giamaProjects/"

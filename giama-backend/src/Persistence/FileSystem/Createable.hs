@@ -10,7 +10,8 @@ import           Domain.Project                            (Project (..))
 import           Domain.Scene                              (Scene (..))
 import           Persistence.FileSystem.DirectoryFunctions (applyDirWithResult)
 import           Persistence.FileSystem.HasFilePath        (HasFilePath (..))
-import           System.Directory                          (createDirectory)
+import           System.Path                               (toFilePath)
+import           System.Path.IO                            (createDirectory)
 
 createParent :: (HasFilePath a, Exception c, Createable b c) => a -> (a -> [b]) -> ([b] -> a -> a) -> IO (Either c a)
 createParent p extractChild buildParent = runExceptT $
@@ -32,4 +33,4 @@ instance Exception e => Createable Scene e where
 instance Exception e => Createable Act e where
   create a = do
     let actPath = getFilePath a
-    applyDirWithResult a (`writeFile` (actName a ++ "\n\n" ++ actContent a)) actPath
+    applyDirWithResult a ((`writeFile` (actName a ++ "\n\n" ++ actContent a)) . toFilePath) actPath

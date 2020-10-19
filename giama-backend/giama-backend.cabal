@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 00681fa5618153cdccb31c95af838a5b57b2ccedbebea4e26a3d3967294c7c9a
+-- hash: d36b54cf353e818335249bf4c7f60538ff040e2a3186b5d7bc30a6723350f3ab
 
 name:           giama-backend
 version:        0.1.0.0
@@ -50,7 +50,7 @@ library
       aeson
     , base >=4.7 && <5
     , directory
-    , filepath
+    , paths
     , servant-server
     , time
     , transformers
@@ -70,8 +70,8 @@ executable giama-backend-Api-exe
       aeson
     , base
     , directory
-    , filepath
     , giama-backend
+    , paths
     , servant-server
     , time
     , transformers
@@ -91,8 +91,8 @@ executable giama-backend-Shell-exe
       aeson
     , base
     , directory
-    , filepath
     , giama-backend
+    , paths
     , servant-server
     , time
     , transformers
@@ -112,11 +112,11 @@ test-suite giama-backend-test
       aeson
     , base
     , directory
-    , filepath
     , giama-backend
     , hspec
     , hspec-wai
     , hspec-wai-json
+    , paths
     , servant-server
     , time
     , transformers

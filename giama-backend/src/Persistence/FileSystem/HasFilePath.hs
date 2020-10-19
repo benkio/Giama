@@ -4,20 +4,20 @@ import           Domain.Act                    (Act (..))
 import           Domain.Project                (Project (..))
 import           Domain.Scene                  (Scene (..))
 import           Persistence.FileSystem.Config (rootPath)
-import           System.FilePath               ((<.>), (</>))
+import           System.Path                   (Absolute, Path, fragment,
+                                                fragments, (</>))
 
 class HasFilePath a where
-  getFilePath :: a -> FilePath
+  getFilePath :: a -> Path Absolute
 
 instance HasFilePath Project where
-  getFilePath p = rootPath </> projectName p
+  getFilePath p = rootPath </> fragment (projectName p)
 
 instance HasFilePath Scene where
   getFilePath s =
-    rootPath </> sceneParentProjectName s </>
-    (show (scenePosition s) ++ "_" ++ sceneName s)
+    rootPath </> fragments [sceneParentProjectName s, show (scenePosition s) ++ "_" ++ sceneName s]
 
 instance HasFilePath Act where
   getFilePath a =
-    rootPath </> actParentProjectName a </> actParentSceneName a </>
-    (show (actPosition a) ++ "_" ++ actName a <.> "txt")
+    rootPath </> fragments [actParentProjectName a, actParentSceneName a,
+    show (actPosition a) ++ "_" ++ actName a ++ "txt"]

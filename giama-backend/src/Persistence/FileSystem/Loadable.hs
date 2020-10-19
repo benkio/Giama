@@ -6,15 +6,18 @@ import           Domain.Project                     (Project (..))
 import           Domain.Scene                       (Scene (..))
 import           Persistence.FileSystem.Config      (rootPath)
 import           Persistence.FileSystem.HasFilePath (HasFilePath (..))
-import           System.Directory                   (getModificationTime,
-                                                     listDirectory)
-import           System.FilePath                    (takeBaseName, (</>))
+import           System.Path                        (Absolute, Path,
+                                                     takeBaseName, toFilePath,
+                                                     toUnrootedFilePath, (</>))
+import           System.Path.IO                     (getDirectoryContents,
+                                                     getModificationTime)
 
-loadPattern :: HasFilePath a => (a -> FilePath -> IO b) -> ([b] -> a -> a) -> a -> IO a
+loadPattern :: HasFilePath a => (a -> Path Absolute -> IO b) -> ([b] -> a -> a) -> a -> IO a
 loadPattern childBuilder parentBulder parent = do
     let parentPath = getFilePath parent
-    childFilePaths <- listDirectory parentPath
-    childs <- traverse (childBuilder parent) childFilePaths
+    childFilePaths <- getDirectoryContents parentPath
+    let childFileAbsolutePaths = (parentPath </> ) <$> childFilePaths
+    childs <- traverse (childBuilder parent) childFileAbsolutePaths
     return $ parentBulder childs parent
 
 class HasFilePath a => Loadable a where
@@ -23,8 +26,7 @@ class HasFilePath a => Loadable a where
 instance Loadable Project where
   load p = loadPattern (\x s->
                            do
-                             let (sp, sn) = span (/= '_') s
-                             print x
+                             let (sp, sn) = span (/= '_') (toUnrootedFilePath (takeBaseName s))
                              modifiedDate <- getModificationTime s
                              load (Scene {
                                       sceneParentProjectName = projectName x
@@ -37,9 +39,9 @@ instance Loadable Project where
 instance Loadable Scene where
   load s = loadPattern (\x a->
           do
-            ac <- readFile $ getFilePath x </> a
+            ac <- (readFile . toFilePath) a
             modifiedDate <- getModificationTime a
-            let (ap, an) = span (/= '_') $ takeBaseName a
+            let (ap, an) = span (/= '_') (toUnrootedFilePath (takeBaseName a))
             return (Act {
                        actParentProjectName  = sceneParentProjectName x
                        , actParentSceneName  = sceneName x
@@ -51,5 +53,12 @@ instance Loadable Scene where
 
 loadProjects :: IO [Project]
 loadProjects = do
-  projectFilePaths <- listDirectory rootPath
-  traverse (\p -> getModificationTime p >>= \md -> load (Project { projectName = p, projectModifiedDate = md, projectScenes = [] })) projectFilePaths
+  projectFilePaths <- getDirectoryContents rootPath
+  let projectAbsolutePaths = (rootPath </>) <$> projectFilePaths
+  traverse (\p -> do
+               prjModifiedDate <- getModificationTime p
+               let prjName = (toUnrootedFilePath . takeBaseName) p
+               load (Project {
+                        projectName = prjName,
+                        projectModifiedDate =
+                        prjModifiedDate, projectScenes = [] })) projectAbsolutePaths
