@@ -21,5 +21,3 @@ instance Exception e => Removable Scene e where
 
 instance Exception e => Removable Act e where
   remove a = applyDirWithResult a removeDirectory (getFilePath a)
-
--- TODO: Add Scene and Act instances

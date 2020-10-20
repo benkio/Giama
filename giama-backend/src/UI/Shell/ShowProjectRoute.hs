@@ -2,16 +2,17 @@ module UI.Shell.ShowProjectRoute (showProjectRoute, showProjectByModifiedDateRou
 
 import           Data.List                       (intersperse)
 import           Domain.HasModifiedDate          (getModifiedDate)
+import           Domain.Project                  (showProjects)
 import           Domain.Sort                     (sortByModifiedDate)
 import           Persistence.FileSystem.Loadable (loadProjects)
 
 showProjectRoute :: IO ()
 showProjectRoute = do
   projects <- loadProjects
-  mapM_ (\p -> print p >> putStrLn "") projects
+  putStrLn $ showProjects projects
 
 showProjectByModifiedDateRoute :: IO ()
 showProjectByModifiedDateRoute = do
     projects <- loadProjects
     let projectSorted = sortByModifiedDate projects
-    mapM_ (\p -> print p >> putStrLn "") projectSorted
+    putStrLn $ showProjects projectSorted

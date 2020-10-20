@@ -1,6 +1,6 @@
 module UI.Shell.App (app) where
 
-import           UI.Shell.Menu (menu)
+import           UI.Shell.Menu (homepageMenu)
 
 app :: IO ()
-app = menu
+app = homepageMenu

@@ -28,6 +28,7 @@ dependencies:
 - paths
 - transformers
 - time
+- bifunctors
 
 library:
   source-dirs: src

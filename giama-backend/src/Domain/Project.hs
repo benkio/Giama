@@ -1,6 +1,6 @@
-module Domain.Project (Project(..), ProjectName, showProjects) where
+module Domain.Project (Project(..), ProjectName, showProjects, createEmptyProject) where
 
-import           Data.Time.Clock        (UTCTime)
+import           Data.Time.Clock        (UTCTime, getCurrentTime)
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
 import           Domain.Identifiers     (ProjectName)
@@ -25,3 +25,10 @@ instance HasName Project where
 instance HasModifiedDate Project where
   getModifiedDate = projectModifiedDate
 
+createEmptyProject :: ProjectName -> IO Project
+createEmptyProject name = getCurrentTime >>= \time ->
+  return Project {
+  projectName         = name
+  , projectModifiedDate = time
+  , projectScenes       = []
+  }

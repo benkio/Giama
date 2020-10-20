@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f220da9df053d2dbc53097f5d41fc92beef5fec914f23ab3e035ea3a6180cfc5
+-- hash: 070d395b422f1cc6c633fbf4ac38ccc9e3cb0bbae840fbdc455d0013b2d7a222
 
 name:           giama-backend
 version:        0.1.0.0
@@ -45,6 +45,7 @@ library
       UI.Shell.App
       UI.Shell.CreateElementRoute
       UI.Shell.Menu
+      UI.Shell.Patterns
       UI.Shell.RemoveElementRoute
       UI.Shell.SearchByNameRoute
       UI.Shell.ShowProjectRoute
@@ -55,6 +56,7 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , bifunctors
     , directory
     , paths
     , servant-server
@@ -75,6 +77,7 @@ executable giama-backend-Api-exe
   build-depends:
       aeson
     , base
+    , bifunctors
     , directory
     , giama-backend
     , paths
@@ -96,6 +99,7 @@ executable giama-backend-Shell-exe
   build-depends:
       aeson
     , base
+    , bifunctors
     , directory
     , giama-backend
     , paths
@@ -117,6 +121,7 @@ test-suite giama-backend-test
   build-depends:
       aeson
     , base
+    , bifunctors
     , directory
     , giama-backend
     , hspec
