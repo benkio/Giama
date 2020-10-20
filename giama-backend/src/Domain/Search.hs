@@ -4,5 +4,4 @@ import           Data.List      (isInfixOf)
 import           Domain.HasName (HasName (..))
 
 searchByName :: HasName a => String -> [a] -> [a]
-searchByName searchTerm elements =
-  filter (isInfixOf searchTerm . getName) elements
+searchByName searchTerm = filter (isInfixOf searchTerm . getName)
