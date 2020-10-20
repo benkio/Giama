@@ -1,12 +1,6 @@
 module UI.Shell.App (app) where
 
-import           Domain.Act                      (Act (..))
-import           Domain.Project                  (Project (..), showProjects)
-import           Domain.Scene                    (Scene (..))
-import           Persistence.FileSystem.Loadable (loadProjects)
+import           UI.Shell.Menu (menu)
 
 app :: IO ()
-app = do
-  x <- loadProjects
-  putStrLn $ showProjects x
-  return ()
+app = menu

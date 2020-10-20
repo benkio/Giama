@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d36b54cf353e818335249bf4c7f60538ff040e2a3186b5d7bc30a6723350f3ab
+-- hash: f220da9df053d2dbc53097f5d41fc92beef5fec914f23ab3e035ea3a6180cfc5
 
 name:           giama-backend
 version:        0.1.0.0
@@ -26,6 +26,7 @@ source-repository head
 
 library
   exposed-modules:
+      Controller.Router
       Domain.Act
       Domain.HasModifiedDate
       Domain.HasName
@@ -42,6 +43,11 @@ library
       Persistence.FileSystem.Removable
       UI.Api.App
       UI.Shell.App
+      UI.Shell.CreateElementRoute
+      UI.Shell.Menu
+      UI.Shell.RemoveElementRoute
+      UI.Shell.SearchByNameRoute
+      UI.Shell.ShowProjectRoute
   other-modules:
       Paths_giama_backend
   hs-source-dirs:
