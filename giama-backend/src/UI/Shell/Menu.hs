@@ -4,8 +4,8 @@ import           UI.Shell.CreateElementRoute (createElementRoute)
 import           UI.Shell.Patterns           (menu, wrongSelection)
 import           UI.Shell.RemoveElementRoute (removeElementRoute)
 import           UI.Shell.SearchByNameRoute  (searchByNameRoute)
-import           UI.Shell.ShowProjectRoute   (showProjectByModifiedDateRoute,
-                                              showProjectRoute)
+import           UI.Shell.ShowProjectRoute   (showProjectsByModifiedDateRoute,
+                                              showProjectsRoute)
 homepageMenu :: IO ()
 homepageMenu = menu homepage selectionRoutes
 
@@ -25,10 +25,10 @@ homepage = " ---------------------- Home Page ---------------------- \n \
 
 selectionRoutes :: String -> IO ()
 selectionRoutes selection
- | "c"   == selection = createElementRoute             >> homepageMenu
- | "sh"  == selection = showProjectRoute               >> homepageMenu
- | "shmd"== selection = showProjectByModifiedDateRoute >> homepageMenu
- | "r"   == selection = removeElementRoute             >> homepageMenu
- | "srn" == selection = searchByNameRoute              >> homepageMenu
+ | "c"   == selection = createElementRoute              >> homepageMenu
+ | "sh"  == selection = showProjectsRoute               >> homepageMenu
+ | "shmd"== selection = showProjectsByModifiedDateRoute >> homepageMenu
+ | "r"   == selection = removeElementRoute              >> homepageMenu
+ | "srn" == selection = searchByNameRoute               >> homepageMenu
  | "q"   == selection = putStrLn "Goodbye! :) "
  | otherwise = wrongSelection selection >> homepageMenu

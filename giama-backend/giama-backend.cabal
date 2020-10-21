@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 070d395b422f1cc6c633fbf4ac38ccc9e3cb0bbae840fbdc455d0013b2d7a222
+-- hash: 0890641fa7c3a9b8561e17583c8e6c3dd0e5b041d330891f0af86fceca4983c8
 
 name:           giama-backend
 version:        0.1.0.0
@@ -35,6 +35,7 @@ library
       Domain.Scene
       Domain.Search
       Domain.Sort
+      LanguageExtensions
       Persistence.FileSystem.Config
       Persistence.FileSystem.Createable
       Persistence.FileSystem.DirectoryFunctions

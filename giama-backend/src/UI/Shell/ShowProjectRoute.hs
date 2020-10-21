@@ -1,18 +1,10 @@
-module UI.Shell.ShowProjectRoute (showProjectRoute, showProjectByModifiedDateRoute) where
+module UI.Shell.ShowProjectRoute (showProjectsRoute, showProjectsByModifiedDateRoute) where
 
-import           Data.List                       (intersperse)
-import           Domain.HasModifiedDate          (getModifiedDate)
-import           Domain.Project                  (showProjects)
-import           Domain.Sort                     (sortByModifiedDate)
-import           Persistence.FileSystem.Loadable (loadProjects)
+import qualified Controller.Router as S (showProjectsByModifiedDateRoute,
+                                         showProjectsRoute)
 
-showProjectRoute :: IO ()
-showProjectRoute = do
-  projects <- loadProjects
-  putStrLn $ showProjects projects
+showProjectsRoute :: IO ()
+showProjectsRoute = S.showProjectsRoute
 
-showProjectByModifiedDateRoute :: IO ()
-showProjectByModifiedDateRoute = do
-    projects <- loadProjects
-    let projectSorted = sortByModifiedDate projects
-    putStrLn $ showProjects projectSorted
+showProjectsByModifiedDateRoute :: IO ()
+showProjectsByModifiedDateRoute = S.showProjectsByModifiedDateRoute

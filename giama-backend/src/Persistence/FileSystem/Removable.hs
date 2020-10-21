@@ -8,7 +8,8 @@ import           Domain.Project                            (Project (..))
 import           Domain.Scene                              (Scene (..))
 import           Persistence.FileSystem.DirectoryFunctions (applyDirWithResult)
 import           Persistence.FileSystem.HasFilePath        (HasFilePath (..))
-import           System.Path.IO                            (removeDirectory)
+import           System.Path.IO                            (removeDirectory,
+                                                            removeFile)
 
 class (HasFilePath a, Exception e) => Removable a e where
   remove :: a -> IO (Either e a)
@@ -20,4 +21,4 @@ instance Exception e => Removable Scene e where
   remove s = applyDirWithResult s removeDirectory (getFilePath s)
 
 instance Exception e => Removable Act e where
-  remove a = applyDirWithResult a removeDirectory (getFilePath a)
+  remove a = applyDirWithResult a removeFile (getFilePath a)

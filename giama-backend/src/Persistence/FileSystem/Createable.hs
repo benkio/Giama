@@ -8,16 +8,17 @@ import           Control.Monad.Trans.Except                (ExceptT (..),
 import           Domain.Act                                (Act (..))
 import           Domain.Project                            (Project (..))
 import           Domain.Scene                              (Scene (..))
+import           LanguageExtensions                        (writeFileIfNotExists)
 import           Persistence.FileSystem.DirectoryFunctions (applyDirWithResult)
 import           Persistence.FileSystem.HasFilePath        (HasFilePath (..))
 import           System.Path                               (toFilePath)
-import           System.Path.IO                            (createDirectory)
+import           System.Path.IO                            (createDirectoryIfMissing)
 
 createParent :: (HasFilePath a, Exception c, Createable b c) => a -> (a -> [b]) -> ([b] -> a -> a) -> IO (Either c a)
 createParent p extractChild buildParent = runExceptT $
   do
     let parentPath = getFilePath p
-    parent <- ExceptT $ applyDirWithResult p createDirectory parentPath
+    parent <- ExceptT $ applyDirWithResult p (createDirectoryIfMissing False) parentPath
     childs <- ExceptT $ sequence <$> traverse create (extractChild parent)
     return $ buildParent childs parent
 
@@ -33,4 +34,4 @@ instance Exception e => Createable Scene e where
 instance Exception e => Createable Act e where
   create a = do
     let actPath = getFilePath a
-    applyDirWithResult a ((`writeFile` (actName a ++ "\n\n" ++ actContent a)) . toFilePath) actPath
+    applyDirWithResult a (writeFileIfNotExists (actName a ++ "\n\n" ++ actContent a)) actPath

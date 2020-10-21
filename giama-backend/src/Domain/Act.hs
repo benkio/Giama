@@ -1,17 +1,18 @@
-module Domain.Act (Act(..)) where
+module Domain.Act (Act(..), createEmptyAct) where
 
-import           Data.Time.Clock        (UTCTime)
+import           Data.Time.Clock        (UTCTime, getCurrentTime)
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
 import           Domain.Identifiers     (ActName, ProjectName, SceneName)
 
 data Act = Act {
-  actParentProjectName :: ProjectName
-  , actParentSceneName :: SceneName
-  , actModifiedDate    :: UTCTime
-  , actPosition        :: Int
-  , actName            :: ActName
-  , actContent         :: String
+  actParentProjectName     :: ProjectName
+  , actParentSceneName     :: SceneName
+  , actParentScenePosition :: Int
+  , actModifiedDate        :: UTCTime
+  , actPosition            :: Int
+  , actName                :: ActName
+  , actContent             :: String
   }
 
 instance Show Act where
@@ -28,3 +29,15 @@ instance HasName Act where
 
 instance HasModifiedDate Act where
   getModifiedDate = actModifiedDate
+
+createEmptyAct :: ProjectName -> SceneName -> Int -> ActName -> Int -> IO Act
+createEmptyAct projectName sceneName scenePosition name position = getCurrentTime >>= \time ->
+  return Act {
+  actParentProjectName      = projectName
+  , actParentSceneName      = sceneName
+  , actParentScenePosition  = scenePosition
+  , actModifiedDate         = time
+  , actPosition             = position
+  , actName                 = name
+  , actContent              = "Empty Act"
+  }

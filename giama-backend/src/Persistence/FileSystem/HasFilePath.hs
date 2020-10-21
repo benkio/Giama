@@ -19,5 +19,5 @@ instance HasFilePath Scene where
 
 instance HasFilePath Act where
   getFilePath a =
-    rootPath </> fragments [actParentProjectName a, actParentSceneName a,
-    show (actPosition a) ++ "_" ++ actName a ++ "txt"]
+    rootPath </> fragments [actParentProjectName a, show (actParentScenePosition a) ++ "_" ++ actParentSceneName a,
+    show (actPosition a) ++ "_" ++ actName a ++ ".txt"]
