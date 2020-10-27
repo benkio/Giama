@@ -15,8 +15,10 @@ import           Data.Maybe                        (fromMaybe)
 import           Domain.Act                        (Act, createEmptyAct)
 import           Domain.HasName                    (HasName (..))
 import           Domain.Project                    (Project, createEmptyProject,
-                                                    showProjects)
+                                                    flatten, showElements,
+                                                    showElementsName)
 import           Domain.Scene                      (Scene, createEmptyScene)
+import           Domain.Search                     (searchByName)
 import           Domain.Sort                       (sortByModifiedDate)
 import           LanguageExtensions                (readMaybe)
 import           Persistence.FileSystem.Createable (Createable (..))
@@ -99,15 +101,20 @@ removeActRoute = do
 
 
 searchByNameRoute :: IO ()
-searchByNameRoute = undefined
+searchByNameRoute = do
+  putStrLn "Insert the name to search, or part of it: "
+  searchTerm <- getLine
+  projects <- loadProjects
+  let results = (searchByName searchTerm . flatten) projects
+  putStrLn $  showElementsName results
 
 showProjectsRoute :: IO ()
 showProjectsRoute = do
   projects <- loadProjects
-  putStrLn $ showProjects projects
+  putStrLn $ showElements projects
 
 showProjectsByModifiedDateRoute :: IO ()
 showProjectsByModifiedDateRoute = do
     projects <- loadProjects
     let projectSorted = sortByModifiedDate projects
-    putStrLn $ showProjects projectSorted
+    putStrLn $ showElements projectSorted
