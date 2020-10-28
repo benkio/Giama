@@ -14,24 +14,23 @@ import           Persistence.FileSystem.HasFilePath        (HasFilePath (..))
 import           System.Path                               (toFilePath)
 import           System.Path.IO                            (createDirectoryIfMissing)
 
-createParent :: (HasFilePath a, Exception c, Createable b c) => a -> (a -> [b]) -> ([b] -> a -> a) -> IO (Either c a)
-createParent p extractChild buildParent = runExceptT $
-  do
+createParent :: (HasFilePath a, Createable b) => a -> (a -> [b]) -> ([b] -> a -> a) -> IO a
+createParent p extractChild buildParent = do
     let parentPath = getFilePath p
-    parent <- ExceptT $ applyDirWithResult p (createDirectoryIfMissing False) parentPath
-    childs <- ExceptT $ sequence <$> traverse create (extractChild parent)
+    parent <- applyDirWithResult p (createDirectoryIfMissing False) parentPath
+    childs <- traverse create (extractChild parent)
     return $ buildParent childs parent
 
-class (HasFilePath a, Exception e) => Createable a e where
-  create :: a -> IO (Either e a)
+class (HasFilePath a) => Createable a where
+  create :: a -> IO a
 
-instance (Exception e) => Createable Project e where
+instance Createable Project where
   create p = createParent p projectScenes (\s p -> p { projectScenes = s })
 
-instance Exception e => Createable Scene e where
+instance Createable Scene where
   create s = createParent s sceneActs (\a s -> s { sceneActs = a })
 
-instance Exception e => Createable Act e where
+instance Createable Act where
   create a = do
     let actPath = getFilePath a
     applyDirWithResult a (writeFileIfNotExists (actName a ++ "\n\n" ++ actContent a)) actPath

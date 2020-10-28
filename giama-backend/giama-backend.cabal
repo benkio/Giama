@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ed2926cd8396ef1c8f05deb45e90a8b65c6fd68dda224a3ed66437f487bc7490
+-- hash: 0d2d50e5b06c4a299fdf232089a6593a4c5ec6d84b273072eda32500fd46fcbb
 
 name:           giama-backend
 version:        0.1.0.0
@@ -28,6 +28,7 @@ library
   exposed-modules:
       Controller.Router
       Domain.Act
+      Domain.BusinessError
       Domain.Element
       Domain.HasModifiedDate
       Domain.HasName

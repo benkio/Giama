@@ -2,7 +2,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Persistence.FileSystem.Removable (Removable(..)) where
 
-import           Control.Exception                         (Exception)
 import           Domain.Act                                (Act (..))
 import           Domain.Project                            (Project (..))
 import           Domain.Scene                              (Scene (..))
@@ -11,14 +10,14 @@ import           Persistence.FileSystem.HasFilePath        (HasFilePath (..))
 import           System.Path.IO                            (removeDirectory,
                                                             removeFile)
 
-class (HasFilePath a, Exception e) => Removable a e where
-  remove :: a -> IO (Either e a)
+class (HasFilePath a) => Removable a where
+  remove :: a -> IO a
 
-instance Exception e => Removable Project e where
+instance Removable Project where
   remove p = applyDirWithResult p removeDirectory (getFilePath p)
 
-instance Exception e => Removable Scene e where
+instance Removable Scene where
   remove s = applyDirWithResult s removeDirectory (getFilePath s)
 
-instance Exception e => Removable Act e where
+instance Removable Act where
   remove a = applyDirWithResult a removeFile (getFilePath a)

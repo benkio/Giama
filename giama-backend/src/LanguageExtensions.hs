@@ -1,5 +1,4 @@
-module LanguageExtensions (readMaybe, writeFileIfNotExists) where
-
+module LanguageExtensions (readMaybe, writeFileIfNotExists, maybeToEither) where
 
 import           System.Path    (toFilePath)
 import           System.Path.IO (Absolute, Path, doesFileExist)
@@ -20,3 +19,6 @@ writeFileIfNotExists content filePath = do
     then return ()
     else writeFile (toFilePath filePath) content
 
+maybeToEither :: a -> Maybe b -> Either a b
+maybeToEither a (Just b) = Right b
+maybeToEither a Nothing  = Left a
