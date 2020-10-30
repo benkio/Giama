@@ -9,18 +9,17 @@ module Controller.Router (
   , removeActRoute
   , searchByNameRoute) where
 
-import           Domain.Identifiers                (ActName, ProjectName,
-                                                    SceneName)
-
+import           Control.Applicative               (liftA2)
 import           Control.Exception                 (SomeException, try)
 import qualified Control.Monad.Trans.Except        as E (ExceptT (..),
                                                          runExceptT)
 import           Data.Bifoldable                   (bifoldMap)
 import           Data.List                         (maximumBy)
-import           Data.Maybe                        (fromMaybe)
-import           Domain.Act                        (Act, createEmptyAct)
+import           Domain.Act                        (Act (..), createEmptyAct)
 import           Domain.BusinessError              (BusinessError)
 import           Domain.HasName                    (HasName (..))
+import           Domain.Identifiers                (ActName, ProjectName,
+                                                    SceneName)
 import           Domain.Project                    (Project (..),
                                                     createEmptyProject, flatten,
                                                     showElements,
@@ -29,10 +28,9 @@ import           Domain.Scene                      (Scene (..),
                                                     createEmptyScene)
 import           Domain.Search                     (searchByName)
 import           Domain.Sort                       (sortByModifiedDate)
-import           LanguageExtensions                (readMaybe)
 import           Persistence.FileSystem.Createable (Createable (..))
-import           Persistence.FileSystem.Loadable   (loadProject, loadProjects,
-                                                    loadScene)
+import           Persistence.FileSystem.Loadable   (loadAct, loadProject,
+                                                    loadProjects, loadScene)
 import           Persistence.FileSystem.Removable  (Removable (..))
 
 getProjectName :: IO ProjectName
@@ -56,8 +54,8 @@ getActName :: IO (ProjectName, SceneName, ActName)
 getActName = do
   (prjName, srnName) <- getSceneName
   putStrLn "> Please insert Act's name: "
-  actName <- getLine
-  return (prjName, srnName, actName)
+  aName <- getLine
+  return (prjName, srnName, aName)
 
 getNewEmptyScene :: IO (Either BusinessError Scene)
 getNewEmptyScene = do
@@ -66,19 +64,12 @@ getNewEmptyScene = do
   let eitherNewScenePosition = (+1) . scenePosition . maximumBy (\s s' -> compare (scenePosition s) (scenePosition s')) . projectScenes <$> eitherProject
   createEmptyScene prjName srnName `traverse` eitherNewScenePosition
 
-getElementPosition :: String -> IO Int
-getElementPosition element = do
-  putStrLn ("> Please insert "++ element ++"'s position(default 0): ")
-  (\s -> fromMaybe 0 (readMaybe s :: Maybe Int)) <$> getLine
-
-getEmptyAct :: IO Act
-getEmptyAct = do
-  (prjName, srnName, actName) <- getActName
-  -- TODO Remove the request of position as for the scene
-  scenePosition <- getElementPosition "Scene"
-  -- TODO Remove the request of position as for the scene
-  actPosition <- getElementPosition "Act"
-  createEmptyAct prjName srnName scenePosition actName actPosition
+getNewEmptyAct :: IO (Either BusinessError Act)
+getNewEmptyAct = do
+  (prjName, srnName, aName) <- getActName
+  eitherScene <- loadScene prjName srnName
+  let eitherNewActPosition = (+1) . actPosition . maximumBy (\a a' -> compare (actPosition a) (actPosition a')) . sceneActs <$> eitherScene
+  traverse (\positions -> createEmptyAct prjName srnName (fst positions) aName (snd positions)) (liftA2 (\s ap -> (scenePosition s, ap)) eitherScene eitherNewActPosition)
 
 createProjectRoute :: IO ()
 createProjectRoute = do
@@ -97,8 +88,9 @@ createSceneRoute = do
 
 createActRoute :: IO ()
 createActRoute = do
-  newEmptyAct <- getEmptyAct
-  eitherActCreated <- (try (create newEmptyAct) :: IO (Either SomeException Act))
+  eitherActCreated <- E.runExceptT (do
+                                       newEmptyAct <- E.ExceptT getNewEmptyAct
+                                       E.ExceptT (try (create newEmptyAct)))
   let result = bifoldMap (\e -> "An error occurred into the act creation: " ++ show e) (\p -> "Act " ++ getName p ++ " Created Successfully!!") eitherActCreated
   putStrLn result
 
@@ -122,8 +114,10 @@ removeSceneRoute = do
 
 removeActRoute :: IO ()
 removeActRoute = do
-  newEmptyAct <- getEmptyAct
-  eitherActRemoved <- (try (remove newEmptyAct) :: IO (Either SomeException Act))
+  eitherActRemoved <- E.runExceptT (do
+                                       (prjName, srnName, aName) <- E.ExceptT $ fmap Right getActName
+                                       act <- E.ExceptT $ loadAct prjName srnName aName
+                                       E.ExceptT (try (remove act)))
   let result = bifoldMap (\e -> "An error occurred into the act removal: " ++ show e) (\p -> "Act " ++ getName p ++ " Removed Successfully!!") eitherActRemoved
   putStrLn result
 

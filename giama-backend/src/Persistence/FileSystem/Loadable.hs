@@ -1,18 +1,16 @@
-module Persistence.FileSystem.Loadable (Loadable(..), loadProjects, loadProject, loadScene) where
-
-import           Domain.Identifiers                 (ProjectName, SceneName)
+module Persistence.FileSystem.Loadable (Loadable(..), loadProjects, loadProject, loadScene, loadAct) where
 
 import           Control.Monad.Trans.Except         (ExceptT (..), except,
                                                      runExceptT)
-
-import           LanguageExtensions                 (maybeToEither)
-
 import           Data.List                          (find, sortOn)
 import           Domain.Act                         (Act (..))
 import           Domain.BusinessError               (BusinessError (..))
 import           Domain.HasName                     (HasName (..))
+import           Domain.Identifiers                 (ActName, ProjectName,
+                                                     SceneName)
 import           Domain.Project                     (Project (..))
 import           Domain.Scene                       (Scene (..))
+import           LanguageExtensions                 (maybeToEither)
 import           Persistence.FileSystem.Config      (rootPath)
 import           Persistence.FileSystem.HasFilePath (HasFilePath (..))
 import           System.Path                        (Absolute, Path,
@@ -83,3 +81,8 @@ loadScene :: ProjectName -> SceneName -> IO (Either BusinessError Scene)
 loadScene prjtName sceneName = runExceptT $ do
   project <- ExceptT $ loadProject prjtName
   except $ maybeToEither SceneNotFound (find (\s -> getName s == sceneName) (projectScenes project))
+
+loadAct :: ProjectName -> SceneName -> ActName ->  IO (Either BusinessError Act)
+loadAct prjtName sceneName actName = runExceptT $ do
+  scene <- ExceptT $ loadScene prjtName sceneName
+  except $ maybeToEither ActNotFound (find (\a -> getName a == actName) (sceneActs scene))
