@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 48e9acbca7c5474335da3d6866e2371ad047a4d1210c1c03efb864e4323e9fff
+-- hash: 467f590d08cd42372b9fb1174c2aeb590fa5b1f9b2a03c54e32e9520f5724dca
 
 name:           giama-backend
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       Domain.Act
       Domain.BusinessError
       Domain.Element
+      Domain.HasChild
       Domain.HasModifiedDate
       Domain.HasName
       Domain.Identifiers
@@ -49,6 +50,7 @@ library
       UI.Shell.App
       UI.Shell.CreateElementRoute
       UI.Shell.Menu
+      UI.Shell.MoveElementRoute
       UI.Shell.Patterns
       UI.Shell.RemoveElementRoute
       UI.Shell.SearchByNameRoute

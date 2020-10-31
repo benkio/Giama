@@ -1,12 +1,16 @@
-module Domain.Project (Project(..), ProjectName, showElements, showElementsName, createEmptyProject, flatten) where
+{-# LANGUAGE MultiParamTypeClasses #-}
+module Domain.Project (Project(..), ProjectName, showElements, showElementsName, createEmptyProject, flatten, extractScene) where
 
-import           Data.List              (concat)
+import           Data.List              (find)
 import           Data.Time.Clock        (UTCTime, getCurrentTime)
+import           Domain.BusinessError   (BusinessError (..))
 import           Domain.Element         (Element, elementPack)
+import           Domain.HasChild        (HasChild (..))
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
-import           Domain.Identifiers     (ProjectName)
+import           Domain.Identifiers     (ProjectName, SceneName)
 import           Domain.Scene           (Scene (..))
+import           LanguageExtensions     (maybeToEither)
 
 data Project = Project {
     projectName           :: ProjectName
@@ -17,6 +21,9 @@ data Project = Project {
 instance Show Project where
   show Project { projectName=pn, projectScenes=ps} =
     pn ++ foldl (\acc s -> acc ++ "\n" ++ show s) "" ps
+
+extractScene :: SceneName -> Project -> Either BusinessError Scene
+extractScene sn = maybeToEither SceneNotFound . find (\s -> sceneName s == sn) . projectScenes
 
 showElementsPattern :: (a -> String) -> [a]-> String
 showElementsPattern showF = foldl (\acc p-> acc ++ "\n" ++ showF p) ""
@@ -40,6 +47,9 @@ flatten ps = projectElements ps ++ projectSceneElements ps ++ projectActsElement
 
 instance HasName Project where
   getName = projectName
+
+instance HasChild Project Scene where
+  getChilds = projectScenes
 
 instance HasModifiedDate Project where
   getModifiedDate = projectModifiedDate
