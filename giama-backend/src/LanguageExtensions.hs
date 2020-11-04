@@ -20,5 +20,5 @@ writeFileIfNotExists content filePath = do
     else writeFile (toFilePath filePath) content
 
 maybeToEither :: a -> Maybe b -> Either a b
-maybeToEither a (Just b) = Right b
+maybeToEither _ (Just b) = Right b
 maybeToEither a Nothing  = Left a

@@ -25,8 +25,7 @@ import           Domain.HasName                    (HasName (..))
 import           Domain.Identifiers                (ActName, ProjectName,
                                                     SceneName)
 import           Domain.Project                    (Project (..),
-                                                    createEmptyProject,
-                                                    extractScene, flatten,
+                                                    createEmptyProject, flatten,
                                                     showElements,
                                                     showElementsName)
 import           Domain.Scene                      (Scene (..),
@@ -140,21 +139,22 @@ moveSceneRoute = do
                                        (prjName, srnName) <- E.ExceptT $ fmap Right getSceneName
                                        liftIO $ putStrLn "> Please insert Target Project name: "
                                        targetPrjName <- liftIO getLine
-                                       project <- E.ExceptT $ loadProject targetPrjName
                                        scene <- E.ExceptT $ loadScene prjName srnName
                                        targetPosition <- liftIO $ getElementPosition "Scene"
-                                       E.ExceptT (move scene targetPosition project))
-  let result = bifoldMap (\e -> "An error occurred into the scene movement: " ++ show e) (\p -> "Scene " ++ getName p ++ " Moved Successfully!!") eitherSceneMoved
+                                       E.ExceptT (move scene targetPosition targetPrjName prjName))
+  let result = bifoldMap (\e -> "An error occurred into the scene movement: " ++ show e) (\p -> "Scene " ++ p ++ " Moved Successfully!!") eitherSceneMoved
   putStrLn result
 
 moveActRoute :: IO ()
 moveActRoute = do
   eitherActMoved <- E.runExceptT (do
                                        (prjName, srnName, aName) <- E.ExceptT $ fmap Right getActName
-                                       scene <- E.ExceptT $ loadScene prjName srnName
-                                       act <- E.except $ extractAct aName scene
+                                       (targetPrjName, targetScnName) <- E.ExceptT $ fmap Right getSceneName
+                                       targetScene <- E.ExceptT $ loadScene targetPrjName targetScnName
+                                       sourceScene <- E.ExceptT $ loadScene prjName srnName
+                                       act <- E.except $ extractAct aName sourceScene
                                        targetPosition <- liftIO $ getElementPosition "Act"
-                                       E.ExceptT (move act targetPosition scene))
+                                       E.ExceptT (move act targetPosition targetScene sourceScene))
   let result = bifoldMap (\e -> "An error occurred into the act movement: " ++ show e) (\p -> "Act " ++ getName p ++ " Moved Successfully!!") eitherActMoved
   putStrLn result
 

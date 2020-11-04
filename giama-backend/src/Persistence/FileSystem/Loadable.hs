@@ -72,17 +72,17 @@ loadProjects = do
                         prjModifiedDate, projectScenes = [] })) projectAbsolutePaths
 
 loadProject :: ProjectName -> IO (Either BusinessError Project)
-loadProject prjtName = do
+loadProject prjName = do
   maybeToEither ProjectNotFound
-       . find (\ p -> getName p == prjtName)
+       . find (\ p -> getName p == prjName)
        <$> loadProjects
 
 loadScene :: ProjectName -> SceneName -> IO (Either BusinessError Scene)
-loadScene prjtName sceneName = runExceptT $ do
-  project <- ExceptT $ loadProject prjtName
-  except $ maybeToEither SceneNotFound (find (\s -> getName s == sceneName) (projectScenes project))
+loadScene prjName scnName = runExceptT $ do
+  project <- ExceptT $ loadProject prjName
+  except $ maybeToEither SceneNotFound (find (\s -> getName s == scnName) (projectScenes project))
 
 loadAct :: ProjectName -> SceneName -> ActName ->  IO (Either BusinessError Act)
-loadAct prjtName sceneName actName = runExceptT $ do
-  scene <- ExceptT $ loadScene prjtName sceneName
-  except $ maybeToEither ActNotFound (find (\a -> getName a == actName) (sceneActs scene))
+loadAct prjName scnName aName = runExceptT $ do
+  scene <- ExceptT $ loadScene prjName scnName
+  except $ maybeToEither ActNotFound (find (\a -> getName a == aName) (sceneActs scene))
