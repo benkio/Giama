@@ -6,38 +6,32 @@ import           Domain.HasName         (HasName (..))
 import           Domain.Identifiers     (ActName, ProjectName, SceneName)
 
 data Act = Act {
-  actParentProjectName     :: ProjectName
-  , actParentSceneName     :: SceneName
+  actName                :: ActName
   , actParentScenePosition :: Int
   , actModifiedDate        :: UTCTime
   , actPosition            :: Int
-  , actName                :: ActName
   , actContent             :: String
   }
 
 instance Show Act where
   show Act{
-         actParentProjectName = appn
-         ,actParentSceneName  = apsn
-         ,actPosition         = ap
-         ,actName             = an
-         } =
-      "       |- (" ++ appn ++ " - " ++ apsn ++ ") - " ++ show ap ++ " " ++ an
+    actName             = an
+    ,actPosition        = ap
+    } =
+    show an ++ show ap
 
 instance HasName Act where
-  getName = actName
+  getName = getName . actName
 
 instance HasModifiedDate Act where
   getModifiedDate = actModifiedDate
 
-createEmptyAct :: ProjectName -> SceneName -> Int -> ActName -> Int -> IO Act
-createEmptyAct projectName sceneName scenePosition name position = getCurrentTime >>= \time ->
+createEmptyAct :: Int -> ActName -> Int -> IO Act
+createEmptyAct scenePosition name position = getCurrentTime >>= \time ->
   return Act {
-  actParentProjectName      = projectName
-  , actParentSceneName      = sceneName
+  actName                 = name
   , actParentScenePosition  = scenePosition
   , actModifiedDate         = time
   , actPosition             = position
-  , actName                 = name
   , actContent              = "Empty Act"
   }

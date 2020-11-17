@@ -12,23 +12,22 @@ import           Domain.Identifiers     (ActName, ProjectName, SceneName)
 import           LanguageExtensions     (maybeToEither)
 
 data Scene = Scene {
-  sceneParentProjectName :: ProjectName
+  sceneName            :: SceneName
   , sceneModifiedDate    :: UTCTime
   , scenePosition        :: Int
-  , sceneName            :: SceneName
   , sceneActs            :: [Act]
   }
 
 instance Show Scene where
   show Scene{
-           sceneParentProjectName = sppn
-           ,scenePosition         = sp
-           ,sceneName             = sn
-           ,sceneActs             = as} =
-    "  |- (" ++ sppn ++ ") - " ++ show sp ++ " " ++ sn ++ foldl (\acc a -> acc ++ "\n" ++ show a) "" as
+    sceneName             = sn
+    ,scenePosition         = sp
+    ,sceneActs             = as
+    } =
+    show sn ++ show sp ++ foldl (\acc a -> acc ++ "\n" ++ show a) "" as
 
 instance HasName Scene where
-  getName = sceneName
+  getName = getName . sceneName
 
 instance HasChild Scene Act where
   getChilds = sceneActs
@@ -37,14 +36,13 @@ instance HasModifiedDate Scene where
   getModifiedDate = sceneModifiedDate
 
 extractAct :: ActName -> Scene -> Either BusinessError Act
-extractAct sn = maybeToEither ActNotFound . find (\s -> actName s == sn) . sceneActs
+extractAct sn = maybeToEither ActNotFound . find (\s -> show (actName s) == show sn) . sceneActs
 
-createEmptyScene :: ProjectName -> SceneName -> Int -> IO Scene
-createEmptyScene projectName name position = getCurrentTime >>= \time ->
+createEmptyScene :: SceneName -> Int -> IO Scene
+createEmptyScene name position = getCurrentTime >>= \time ->
   return Scene {
-  sceneParentProjectName = projectName
+  sceneName            = name
   , sceneModifiedDate    = time
   , scenePosition        = position
-  , sceneName            = name
   , sceneActs            = []
   }

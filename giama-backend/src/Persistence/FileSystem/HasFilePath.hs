@@ -11,7 +11,7 @@ class HasFilePath a where
   getFilePath :: a -> Path Absolute
 
 instance HasFilePath Project where
-  getFilePath p = rootPath </> fragment (projectName p)
+  getFilePath p = rootPath </> fragment (show (projectName p))
 
 instance HasFilePath Scene where
   getFilePath s =

@@ -20,10 +20,10 @@ data Project = Project {
 
 instance Show Project where
   show Project { projectName=pn, projectScenes=ps} =
-    pn ++ foldl (\acc s -> acc ++ "\n" ++ show s) "" ps
+    show pn ++ foldl (\acc s -> acc ++ "\n" ++ show s) "" ps
 
 extractScene :: SceneName -> Project -> Either BusinessError Scene
-extractScene sn = maybeToEither SceneNotFound . find (\s -> sceneName s == sn) . projectScenes
+extractScene sn = maybeToEither SceneNotFound . find (\s -> show (sceneName s) == show sn) . projectScenes
 
 showElementsPattern :: (a -> String) -> [a]-> String
 showElementsPattern showF = foldl (\acc p-> acc ++ "\n" ++ showF p) ""
@@ -46,7 +46,7 @@ flatten ps = projectElements ps ++ projectSceneElements ps ++ projectActsElement
 
 
 instance HasName Project where
-  getName = projectName
+  getName = getName . projectName
 
 instance HasChild Project Scene where
   getChilds = projectScenes
