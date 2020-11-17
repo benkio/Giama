@@ -1,5 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
-module Domain.Project (Project(..), ProjectName, showElements, showElementsName, createEmptyProject, flatten, extractScene) where
+module Domain.Project (Project(..), ProjectId, showElements, showElementsName, createEmptyProject, flatten, extractScene) where
 
 import           Data.List              (find)
 import           Data.Time.Clock        (UTCTime, getCurrentTime)
@@ -8,22 +8,22 @@ import           Domain.Element         (Element, elementPack)
 import           Domain.HasChild        (HasChild (..))
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
-import           Domain.Identifiers     (ProjectName, SceneName)
+import           Domain.Identifiers     (ProjectId, SceneId)
 import           Domain.Scene           (Scene (..))
 import           LanguageExtensions     (maybeToEither)
 
 data Project = Project {
-    projectName           :: ProjectName
+    projectId           :: ProjectId
     , projectModifiedDate :: UTCTime
     , projectScenes       :: [Scene]
   }
 
 instance Show Project where
-  show Project { projectName=pn, projectScenes=ps} =
+  show Project { projectId=pn, projectScenes=ps} =
     show pn ++ foldl (\acc s -> acc ++ "\n" ++ show s) "" ps
 
-extractScene :: SceneName -> Project -> Either BusinessError Scene
-extractScene sn = maybeToEither SceneNotFound . find (\s -> show (sceneName s) == show sn) . projectScenes
+extractScene :: SceneId -> Project -> Either BusinessError Scene
+extractScene sn = maybeToEither SceneNotFound . find (\s -> show (sceneId s) == show sn) . projectScenes
 
 showElementsPattern :: (a -> String) -> [a]-> String
 showElementsPattern showF = foldl (\acc p-> acc ++ "\n" ++ showF p) ""
@@ -46,7 +46,7 @@ flatten ps = projectElements ps ++ projectSceneElements ps ++ projectActsElement
 
 
 instance HasName Project where
-  getName = getName . projectName
+  getName = getName . projectId
 
 instance HasChild Project Scene where
   getChilds = projectScenes
@@ -54,10 +54,10 @@ instance HasChild Project Scene where
 instance HasModifiedDate Project where
   getModifiedDate = projectModifiedDate
 
-createEmptyProject :: ProjectName -> IO Project
+createEmptyProject :: ProjectId -> IO Project
 createEmptyProject name = getCurrentTime >>= \time ->
   return Project {
-  projectName         = name
+  projectId         = name
   , projectModifiedDate = time
   , projectScenes       = []
   }

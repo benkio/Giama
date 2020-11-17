@@ -2,6 +2,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Persistence.FileSystem.Createable (Createable(..)) where
 
+import           Domain.HasName                     (HasName (..), getName)
+
 import           Domain.Act                                (Act (..))
 import           Domain.Project                            (Project (..))
 import           Domain.Scene                              (Scene (..))
@@ -29,4 +31,4 @@ instance Createable Scene where
 instance Createable Act where
   create a = do
     let actPath = getFilePath a
-    applyDirWithResult a (writeFileIfNotExists (actName a ++ "\n\n" ++ actContent a)) actPath
+    applyDirWithResult a (writeFileIfNotExists (getName (actId a) ++ "\n\n" ++ actContent a)) actPath

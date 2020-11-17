@@ -1,51 +1,36 @@
-module Domain.Identifiers (ProjectName, SceneName, ActName, Identifier, projectNameId, sceneNameId, actNameId) where
+module Domain.Identifiers (ProjectId(..), SceneId(..), ActId(..), projectIdConstructor, sceneIdConstructor, actIdConstructor) where
 
 import           Domain.HasName                    (HasName (..))
 
-data Identifier = ProjectName
-                 | SceneName
-                 | ActName
+data ProjectId = MkProjectId String
+data SceneId   = MkSceneId String (String, Int)
+data ActId     = MkActId String (String, Int) (String, Int)
 
-data ProjectName = MkProjectName String
-data SceneName   = MkSceneName String String
-data ActName     = MkActName String String String
+projectIdConstructor :: String -> ProjectId
+projectIdConstructor = MkProjectId
 
-projectNameId :: String -> ProjectName
-projectNameId = MkProjectName
+sceneIdConstructor :: ProjectId -> String -> Int -> SceneId
+sceneIdConstructor (MkProjectId prjn) scnn position = MkSceneId prjn (scnn, position)
 
-sceneNameId :: ProjectName -> String -> SceneName
-sceneNameId (MkProjectName prjn) scnn = MkSceneName prjn scnn
-
-actNameId :: SceneName -> String -> ActName
-actNameId (MkSceneName prjn srnn) actn = MkActName prjn srnn actn
-
--- viewPattern -----------------------
-
-data ViewIdentifier =   ProjectNameView String 
-                      | SceneNameView   String String 
-                      | ActNameView     String String String
-
-view :: Identifier -> ViewIdentifier
-view (MkProjectName prjn           )    = ProjectNameView prjn           
-view (MkSceneName   prjn scnn      )    = SceneNameView   prjn scnn     
-view (MkActName     prjn scnn actn   )  = ActNameView     prjn scnn actn
+actIdConstructor :: SceneId -> String -> Int -> ActId
+actIdConstructor (MkSceneId prjn srnn) actn position = MkActId prjn srnn (actn, position)
 
 -- instances -------------------------
 
-instance Show ProjectName where
-  show (MkProjectName prjn) = prjn
+instance Show ProjectId where
+  show (MkProjectId prjn) = prjn
 
-instance Show SceneName where
-  show (MkSceneName prjn scnn) = "  |- (" ++ prjn ++ ") - " ++ scnn ++ " "
+instance Show SceneId where
+  show (MkSceneId prjn (scnn, scnp)) = "  |- (" ++ prjn ++ ") - " ++ scnn ++ " " ++ show scnp
 
-instance Show ActName where
-  show (MkActName prjn scnn actn) = "       |- (" ++ prjn ++ " - " ++ scnn ++ ") - " ++ actn ++ " "
+instance Show ActId where
+  show (MkActId prjn (scnn, _) (actn, position)) = "       |- (" ++ prjn ++ " - " ++ scnn ++ ") - " ++ actn ++ " " ++ show position
 
-instance HasName ProjectName where
-  getName (MkProjectName prjn) = prjn
+instance HasName ProjectId where
+  getName (MkProjectId prjn) = prjn
 
-instance HasName SceneName where
-  getName (MkSceneName _ scnn) = scnn
+instance HasName SceneId where
+  getName (MkSceneId _ (scnn, _)) = scnn
 
-instance HasName ActName where
-  getName (MkActName _ _ actn) = actn
+instance HasName ActId where
+  getName (MkActId _ _ (actn, _)) = actn

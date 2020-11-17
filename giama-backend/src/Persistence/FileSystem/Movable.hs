@@ -5,7 +5,7 @@ module Persistence.FileSystem.Movable where
 
 import           Control.Monad.IO.Class             (liftIO)
 
-import           Domain.Identifiers                 (ProjectName, SceneName)
+import           Domain.Identifiers                 (ProjectId, SceneId)
 
 import qualified Control.Monad.Trans.Except         as E (ExceptT (..), except,
                                                           runExceptT)
@@ -25,54 +25,54 @@ import           System.Path                        (toFilePath)
 class Movable a b where
   move :: a -> Int -> b -> b -> IO (Either BusinessError b)
 
-instance Movable Scene ProjectName where
+instance Movable Scene ProjectId where
   move = moveScene
 
-instance Movable Act SceneName where
+instance Movable Act SceneId where
   move = moveAct
 
 positionCheck :: (HasChild a b) => Int -> a -> (b -> Int) -> Int
 positionCheck position parent childExtractPosition =
   min position $ ((+1) . maximum . fmap childExtractPosition . getChilds) parent
 
-moveScene :: Scene -> Int -> ProjectName -> ProjectName -> IO (Either BusinessError ProjectName)
-moveScene sceneToMove position targetProjectName sourceProjectName = E.runExceptT $ do
-  sourceProject <- E.ExceptT (loadProject sourceProjectName)
+moveScene :: Scene -> Int -> ProjectId -> ProjectId -> IO (Either BusinessError ProjectId)
+moveScene sceneToMove position targetProjectId sourceProjectId = E.runExceptT $ do
+  sourceProject <- E.ExceptT (loadProject sourceProjectId)
   let followingSourceProjectScenes = (fmap (\s -> ((toFilePath . getFilePath) s, (toFilePath . getFilePath) (s {scenePosition = scenePosition s - 1}))) .
                                       filter (\s -> scenePosition s > scenePosition sceneToMove) .
                                       projectScenes) sourceProject
 
   liftIO $ uncurry renameDirectory `traverse_` followingSourceProjectScenes
 
-  targetProject <- E.ExceptT (loadProject targetProjectName)
+  targetProject <- E.ExceptT (loadProject targetProjectId)
   let pos = positionCheck position targetProject scenePosition
       sceneToMovePath = getFilePath sceneToMove
-      targetSceneToMovePath = getFilePath $ sceneToMove { scenePosition = pos, sceneParentProjectName = targetProjectName }
+      targetSceneToMovePath = getFilePath $ sceneToMove { scenePosition = pos, sceneParentProjectId = targetProjectId }
       followingTargetProjectScenes = (fmap (\s -> ((toFilePath . getFilePath) s, (toFilePath . getFilePath) (s {scenePosition = scenePosition s + 1}))) .
                                       filter (\s -> scenePosition s >= pos && sceneName s /= sceneName sceneToMove) .
                                       projectScenes) targetProject
 
   liftIO $ renameDirectory (toFilePath sceneToMovePath) (toFilePath targetSceneToMovePath)
   liftIO $ uncurry renameDirectory `traverse_` followingTargetProjectScenes
-  return targetProjectName
+  return targetProjectId
 
-moveAct :: Act -> Int -> SceneName -> SceneName -> IO (Either BusinessError SceneName)
-moveAct actToMove position targetSceneName sourceSceneName = -- E.runExceptT $ do
-  -- sourceProject <- E.ExceptT (loadProject sourceProjectName)
+moveAct :: Act -> Int -> SceneId -> SceneId -> IO (Either BusinessError SceneId)
+moveAct actToMove position targetSceneId sourceSceneId = -- E.runExceptT $ do
+  -- sourceProject <- E.ExceptT (loadProject sourceProjectId)
   -- let followingSourceProjectScenes = (fmap (\s -> ((toFilePath . getFilePath) s, (toFilePath . getFilePath) (s {scenePosition = scenePosition s - 1}))) .
   --                                     filter (\s -> scenePosition s > scenePosition sceneToMove) .
   --                                     projectScenes) sourceProject
 
   -- liftIO $ uncurry renameDirectory `traverse_` followingSourceProjectScenes
 
-  -- targetProject <- E.ExceptT (loadProject targetProjectName)
+  -- targetProject <- E.ExceptT (loadProject targetProjectId)
   -- let pos = positionCheck position targetProject scenePosition
   --     sceneToMovePath = getFilePath sceneToMove
-  --     targetSceneToMovePath = getFilePath $ sceneToMove { scenePosition = pos, sceneParentProjectName = targetProjectName }
+  --     targetSceneToMovePath = getFilePath $ sceneToMove { scenePosition = pos, sceneParentProjectId = targetProjectId }
   --     followingTargetProjectScenes = (fmap (\s -> ((toFilePath . getFilePath) s, (toFilePath . getFilePath) (s {scenePosition = scenePosition s + 1}))) .
   --                                     filter (\s -> scenePosition s >= pos && sceneName s /= sceneName sceneToMove) .
   --                                     projectScenes) targetProject
 
   -- liftIO $ renameDirectory (toFilePath sceneToMovePath) (toFilePath targetSceneToMovePath)
   -- liftIO $ uncurry renameDirectory `traverse_` followingTargetProjectScenes
-  -- return targetProjectName
+  -- return targetProjectId

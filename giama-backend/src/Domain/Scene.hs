@@ -8,26 +8,24 @@ import           Domain.BusinessError   (BusinessError (..))
 import           Domain.HasChild        (HasChild (..))
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
-import           Domain.Identifiers     (ActName, ProjectName, SceneName)
+import           Domain.Identifiers     (ActId, ProjectId, SceneId)
 import           LanguageExtensions     (maybeToEither)
 
 data Scene = Scene {
-  sceneName            :: SceneName
+  sceneId            :: SceneId
   , sceneModifiedDate    :: UTCTime
-  , scenePosition        :: Int
   , sceneActs            :: [Act]
   }
 
 instance Show Scene where
   show Scene{
-    sceneName             = sn
-    ,scenePosition         = sp
+    sceneId                = sId
     ,sceneActs             = as
     } =
-    show sn ++ show sp ++ foldl (\acc a -> acc ++ "\n" ++ show a) "" as
+    show sId ++ foldl (\acc a -> acc ++ "\n" ++ show a) "" as
 
 instance HasName Scene where
-  getName = getName . sceneName
+  getName = getName . sceneId
 
 instance HasChild Scene Act where
   getChilds = sceneActs
@@ -35,14 +33,15 @@ instance HasChild Scene Act where
 instance HasModifiedDate Scene where
   getModifiedDate = sceneModifiedDate
 
-extractAct :: ActName -> Scene -> Either BusinessError Act
-extractAct sn = maybeToEither ActNotFound . find (\s -> show (actName s) == show sn) . sceneActs
+extractAct :: ActId -> Scene -> Either BusinessError Act
+extractAct sn = maybeToEither ActNotFound . find (\s -> show (actId s) == show sn) . sceneActs
 
-createEmptyScene :: SceneName -> Int -> IO Scene
-createEmptyScene name position = getCurrentTime >>= \time ->
+createEmptyScene :: SceneId -> IO Scene
+createEmptyScene scnId = getCurrentTime >>= \time ->
   return Scene {
-  sceneName            = name
+  sceneId            = scnId
   , sceneModifiedDate    = time
-  , scenePosition        = position
   , sceneActs            = []
   }
+
+

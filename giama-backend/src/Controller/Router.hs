@@ -22,8 +22,8 @@ import           Data.Maybe                        (fromMaybe)
 import           Domain.Act                        (Act (..), createEmptyAct)
 import           Domain.BusinessError              (BusinessError)
 import           Domain.HasName                    (HasName (..))
-import           Domain.Identifiers                (ActName, ProjectName,
-                                                    SceneName)
+import           Domain.Identifiers                (ActId, ProjectId,
+                                                    SceneId)
 import           Domain.Project                    (Project (..),
                                                     createEmptyProject, flatten,
                                                     showElements,
@@ -40,26 +40,26 @@ import           Persistence.FileSystem.Loadable   (loadAct, loadProject,
 import           Persistence.FileSystem.Movable    (Movable (..))
 import           Persistence.FileSystem.Removable  (Removable (..))
 
-getProjectName :: IO ProjectName
-getProjectName =   do
+getProjectId :: IO ProjectId
+getProjectId =   do
   putStrLn "> Please insert Project name: "
   getLine
 
 getEmptyProject :: IO Project
 getEmptyProject = do
-  prjName <- getProjectName
+  prjName <- getProjectId
   createEmptyProject prjName
 
-getSceneName :: IO (ProjectName, SceneName)
-getSceneName = do
-  prjName <- getProjectName
+getSceneId :: IO (ProjectId, SceneId)
+getSceneId = do
+  prjName <- getProjectId
   putStrLn "> Please insert Scene's name: "
   srnName <- getLine
   return (prjName, srnName)
 
-getActName :: IO (ProjectName, SceneName, ActName)
-getActName = do
-  (prjName, srnName) <- getSceneName
+getActId :: IO (ProjectId, SceneId, ActId)
+getActId = do
+  (prjName, srnName) <- getSceneId
   putStrLn "> Please insert Act's name: "
   aName <- getLine
   return (prjName, srnName, aName)
@@ -71,14 +71,14 @@ getElementPosition element = do
 
 getNewEmptyScene :: IO (Either BusinessError Scene)
 getNewEmptyScene = do
-  (prjName, srnName) <- getSceneName
+  (prjName, srnName) <- getSceneId
   eitherProject <- loadProject prjName
   let eitherNewScenePosition = (+1) . scenePosition . maximumBy (\s s' -> compare (scenePosition s) (scenePosition s')) . projectScenes <$> eitherProject
   createEmptyScene prjName srnName `traverse` eitherNewScenePosition
 
 getNewEmptyAct :: IO (Either BusinessError Act)
 getNewEmptyAct = do
-  (prjName, srnName, aName) <- getActName
+  (prjName, srnName, aName) <- getActId
   eitherScene <- loadScene prjName srnName
   let eitherNewActPosition = (+1) . actPosition . maximumBy (\a a' -> compare (actPosition a) (actPosition a')) . sceneActs <$> eitherScene
   traverse (\positions -> createEmptyAct prjName srnName (fst positions) aName (snd positions)) (liftA2 (\s ap -> (scenePosition s, ap)) eitherScene eitherNewActPosition)
@@ -117,7 +117,7 @@ removeProjectRoute = do
 removeSceneRoute :: IO ()
 removeSceneRoute = do
   eitherSceneRemoved <- E.runExceptT (do
-                                       (prjName, srnName) <- E.ExceptT $ fmap Right getSceneName
+                                       (prjName, srnName) <- E.ExceptT $ fmap Right getSceneId
                                        scene <- E.ExceptT $ loadScene prjName srnName
                                        E.ExceptT (try (remove scene)))
   let result = bifoldMap (\e -> "An error occurred into the scene removal: " ++ show e) (\p -> "Scene " ++ getName p ++ " Removed Successfully!!") eitherSceneRemoved
@@ -127,7 +127,7 @@ removeSceneRoute = do
 removeActRoute :: IO ()
 removeActRoute = do
   eitherActRemoved <- E.runExceptT (do
-                                       (prjName, srnName, aName) <- E.ExceptT $ fmap Right getActName
+                                       (prjName, srnName, aName) <- E.ExceptT $ fmap Right getActId
                                        act <- E.ExceptT $ loadAct prjName srnName aName
                                        E.ExceptT (try (remove act)))
   let result = bifoldMap (\e -> "An error occurred into the act removal: " ++ show e) (\p -> "Act " ++ getName p ++ " Removed Successfully!!") eitherActRemoved
@@ -136,7 +136,7 @@ removeActRoute = do
 moveSceneRoute :: IO ()
 moveSceneRoute = do
   eitherSceneMoved <- E.runExceptT (do
-                                       (prjName, srnName) <- E.ExceptT $ fmap Right getSceneName
+                                       (prjName, srnName) <- E.ExceptT $ fmap Right getSceneId
                                        liftIO $ putStrLn "> Please insert Target Project name: "
                                        targetPrjName <- liftIO getLine
                                        scene <- E.ExceptT $ loadScene prjName srnName
@@ -148,8 +148,8 @@ moveSceneRoute = do
 moveActRoute :: IO ()
 moveActRoute = do
   eitherActMoved <- E.runExceptT (do
-                                       (prjName, srnName, aName) <- E.ExceptT $ fmap Right getActName
-                                       (targetPrjName, targetScnName) <- E.ExceptT $ fmap Right getSceneName
+                                       (prjName, srnName, aName) <- E.ExceptT $ fmap Right getActId
+                                       (targetPrjName, targetScnName) <- E.ExceptT $ fmap Right getSceneId
                                        targetScene <- E.ExceptT $ loadScene targetPrjName targetScnName
                                        sourceScene <- E.ExceptT $ loadScene prjName srnName
                                        act <- E.except $ extractAct aName sourceScene

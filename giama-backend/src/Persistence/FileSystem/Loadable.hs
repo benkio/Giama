@@ -6,8 +6,8 @@ import           Data.List                          (find, sortOn)
 import           Domain.Act                         (Act (..))
 import           Domain.BusinessError               (BusinessError (..))
 import           Domain.HasName                     (HasName (..))
-import           Domain.Identifiers                 (ActName, ProjectName,
-                                                     SceneName)
+import           Domain.Identifiers                 (ActId, ProjectId,
+                                                     SceneId)
 import           Domain.Project                     (Project (..))
 import           Domain.Scene                       (Scene (..))
 import           LanguageExtensions                 (maybeToEither)
@@ -35,11 +35,10 @@ instance Loadable Project where
                            do
                              let (sp, sn) = span (/= '_') (toUnrootedFilePath (takeBaseName s))
                              modifiedDate <- getModificationTime s
+                             let projectId = projectIdConstructor (projectId x)
                              load (Scene {
-                                      sceneParentProjectName = projectName x
+                                      sceneId            = sceneIdConstructor projectId (tail sn) (read sp :: Int)
                                       , sceneModifiedDate    = modifiedDate
-                                      ,scenePosition         = read sp :: Int
-                                      ,sceneName             = tail sn
                                       ,sceneActs             = []         })) (\ss x -> x { projectScenes = sortOn scenePosition ss}) p
 
 
@@ -50,8 +49,8 @@ instance Loadable Scene where
             modifiedDate <- getModificationTime a
             let (ap, an) = span (/= '_') (toUnrootedFilePath (takeBaseName a))
             return (Act {
-                       actParentProjectName      = sceneParentProjectName x
-                       , actParentSceneName      = sceneName x
+                       actParentProjectId      = sceneParentProjectId x
+                       , actParentSceneId      = sceneName x
                        , actParentScenePosition  = scenePosition x
                        , actModifiedDate         = modifiedDate
                        , actPosition             = read ap :: Int
@@ -71,18 +70,18 @@ loadProjects = do
                         projectModifiedDate =
                         prjModifiedDate, projectScenes = [] })) projectAbsolutePaths
 
-loadProject :: ProjectName -> IO (Either BusinessError Project)
+loadProject :: ProjectId -> IO (Either BusinessError Project)
 loadProject prjName = do
   maybeToEither ProjectNotFound
        . find (\ p -> getName p == prjName)
        <$> loadProjects
 
-loadScene :: ProjectName -> SceneName -> IO (Either BusinessError Scene)
+loadScene :: ProjectId -> SceneId -> IO (Either BusinessError Scene)
 loadScene prjName scnName = runExceptT $ do
   project <- ExceptT $ loadProject prjName
   except $ maybeToEither SceneNotFound (find (\s -> getName s == scnName) (projectScenes project))
 
-loadAct :: ProjectName -> SceneName -> ActName ->  IO (Either BusinessError Act)
+loadAct :: ProjectId -> SceneId -> ActId ->  IO (Either BusinessError Act)
 loadAct prjName scnName aName = runExceptT $ do
   scene <- ExceptT $ loadScene prjName scnName
   except $ maybeToEither ActNotFound (find (\a -> getName a == aName) (sceneActs scene))
