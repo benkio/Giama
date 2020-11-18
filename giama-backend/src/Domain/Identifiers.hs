@@ -1,4 +1,19 @@
-module Domain.Identifiers (ProjectId, SceneId, ActId, projectIdConstructor, sceneIdConstructor, actIdConstructor, sceneIdPosition, actIdPosition, projectIdFromSceneId, projectIdFromActId, sceneIdFromActId) where
+module Domain.Identifiers (ProjectId
+, SceneId
+, ActId
+, projectIdConstructor
+, sceneIdConstructor
+, actIdConstructor
+, sceneIdPosition
+, actIdPosition
+, projectIdFromSceneId
+, projectIdFromActId
+, sceneIdFromActId
+, sceneIdModifyPosition
+, actIdModifyPosition
+  , sceneIdModifyProject
+  , actIdModifyProject
+  , actIdModifyScene) where
 
 import           Domain.HasName                    (HasName (..))
 
@@ -33,6 +48,25 @@ sceneIdPosition (MkSceneId _ (_, pos)) = pos
 
 actIdPosition :: ActId -> Int
 actIdPosition (MkActId _ _ (_, pos)) = pos
+
+-- Modifiers ---------------------------
+
+sceneIdModifyPosition :: (Int -> Int) -> SceneId -> SceneId
+sceneIdModifyPosition f (MkSceneId prjn (scnn, pos)) =
+  MkSceneId prjn (scnn, f pos)
+
+sceneIdModifyProject :: ProjectId -> SceneId -> SceneId
+sceneIdModifyProject (MkProjectId prjn) (MkSceneId _ scn) = MkSceneId prjn scn
+
+actIdModifyPosition :: (Int -> Int) -> ActId -> ActId
+actIdModifyPosition f (MkActId prjn scnId (an, pos)) =
+  MkActId prjn scnId (an, f pos)
+
+actIdModifyProject :: ProjectId -> ActId -> ActId
+actIdModifyProject (MkProjectId prjn) (MkActId _ scn act) = MkActId prjn scn act
+
+actIdModifyScene :: SceneId -> ActId -> ActId
+actIdModifyScene (MkSceneId prjn scn) (MkActId _ _ act) = MkActId prjn scn act
 
 -- instances -------------------------
 

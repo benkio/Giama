@@ -7,7 +7,7 @@ import           Domain.Act                         (Act (..), actPosition)
 import           Domain.BusinessError               (BusinessError (..))
 import           Domain.HasName                     (HasName (..))
 import           Domain.Identifiers                 (ActId, ProjectId,
-                                                     SceneId, projectIdConstructor, sceneIdConstructor, actIdConstructor)
+                                                     SceneId, projectIdConstructor, sceneIdConstructor, actIdConstructor, projectIdFromSceneId,  sceneIdFromActId)
 import           Domain.Project                     (Project (..))
 import           Domain.Scene                       (Scene (..), scenePosition)
 import           LanguageExtensions                 (maybeToEither)
@@ -73,12 +73,12 @@ loadProject prjName = do
        . find (\ p -> show (getName p) == show prjName)
        <$> loadProjects
 
-loadScene :: ProjectId -> SceneId -> IO (Either BusinessError Scene)
-loadScene prjName scnName = runExceptT $ do
-  project <- ExceptT $ loadProject prjName
-  except $ maybeToEither SceneNotFound (find (\s -> show (getName s) == show scnName) (projectScenes project))
+loadScene :: SceneId -> IO (Either BusinessError Scene)
+loadScene scnId = runExceptT $ do
+  project <- ExceptT $ loadProject (projectIdFromSceneId scnId)
+  except $ maybeToEither SceneNotFound (find (\s -> getName s == getName scnId) (projectScenes project))
 
-loadAct :: ProjectId -> SceneId -> ActId ->  IO (Either BusinessError Act)
-loadAct prjName scnName aName = runExceptT $ do
-  scene <- ExceptT $ loadScene prjName scnName
-  except $ maybeToEither ActNotFound (find (\a -> show (getName a) == show aName) (sceneActs scene))
+loadAct :: ActId ->  IO (Either BusinessError Act)
+loadAct aId = runExceptT $ do
+  scene <- ExceptT $ loadScene (sceneIdFromActId aId)
+  except $ maybeToEither ActNotFound (find (\a -> getName a == getName aId) (sceneActs scene))
