@@ -3,12 +3,17 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Persistence.FileSystem.Movable where
 
-import           Domain.Identifiers     (ActId, ProjectId, SceneId, sceneIdPosition, projectIdFromSceneId)
-
+import Domain.Identifiers
+      ( ActId,
+        ProjectId,
+        SceneId,
+        sceneIdPosition,
+        projectIdFromSceneId,
+        ProjectId,
+        SceneId,
+        sceneIdModifyPosition,
+        sceneIdModifyProject )
 import           Control.Monad.IO.Class             (liftIO)
-
-import           Domain.Identifiers                 (ProjectId, SceneId, sceneIdModifyPosition, sceneIdModifyProject)
-
 import qualified Control.Monad.Trans.Except         as E (ExceptT (..), except,
                                                           runExceptT)
 import           Data.Foldable                      (traverse_)

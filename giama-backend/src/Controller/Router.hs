@@ -44,8 +44,7 @@ import           Persistence.FileSystem.Removable  (Removable (..))
 getProjectId :: IO ProjectId
 getProjectId =   do
   putStrLn "> Please insert Project name: "
-  prjn <- getLine
-  return $ projectIdConstructor prjn
+  projectIdConstructor <$> getLine
 
 getSceneName :: IO String
 getSceneName = do
@@ -116,7 +115,7 @@ removeProjectRoute = do
 removeSceneRoute :: IO ()
 removeSceneRoute = do
   eitherSceneRemoved <- E.runExceptT (do
-                                       emptyScene <- E.ExceptT $ getNewEmptyScene
+                                       emptyScene <- E.ExceptT getNewEmptyScene
                                        scene <- E.ExceptT $ loadScene (sceneId emptyScene)
                                        E.ExceptT (try (remove scene)))
   let result = bifoldMap (\e -> "An error occurred into the scene removal: " ++ show e) (\p -> "Scene " ++ getName p ++ " Removed Successfully!!") eitherSceneRemoved
@@ -126,7 +125,7 @@ removeSceneRoute = do
 removeActRoute :: IO ()
 removeActRoute = do
   eitherActRemoved <- E.runExceptT (do
-                                       emptyAct <- E.ExceptT $ getNewEmptyAct
+                                       emptyAct <- E.ExceptT getNewEmptyAct
                                        act <- E.ExceptT $ loadAct (actId emptyAct)
                                        E.ExceptT (try (remove act)))
   let result = bifoldMap (\e -> "An error occurred into the act removal: " ++ show e) (\p -> "Act " ++ getName p ++ " Removed Successfully!!") eitherActRemoved
@@ -135,7 +134,7 @@ removeActRoute = do
 moveSceneRoute :: IO ()
 moveSceneRoute = do
   eitherSceneMoved <- E.runExceptT (do
-                                       emptyScene <- E.ExceptT $ getNewEmptyScene
+                                       emptyScene <- E.ExceptT getNewEmptyScene
                                        liftIO $ putStrLn "> Please insert Target Project name: "
                                        targetPrjId <- liftIO (projectIdConstructor <$> getLine)
                                        scene <- E.ExceptT $ loadScene (sceneId emptyScene)
@@ -147,7 +146,7 @@ moveSceneRoute = do
 moveActRoute :: IO ()
 moveActRoute = do
   eitherActMoved <- E.runExceptT (do
-                                       emptyAct <- E.ExceptT $ getNewEmptyAct
+                                       emptyAct <- E.ExceptT getNewEmptyAct
                                        sourceScene <- E.ExceptT $ loadScene (sceneIdFromActId (actId emptyAct))
                                        act <- E.except $ extractAct (actId emptyAct) sourceScene
 

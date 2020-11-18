@@ -1,11 +1,15 @@
 module Domain.Act (Act(..), createEmptyAct, actPosition, actProjectName , actSceneName , actName , actScenePosition) where
 
-import Domain.Identifiers (projectIdFromActId, sceneIdFromActId, sceneIdPosition, sceneIdFromActId)
-
+import Domain.Identifiers
+      ( projectIdFromActId,
+        sceneIdFromActId,
+        sceneIdPosition,
+        sceneIdFromActId,
+        ActId,
+        actIdPosition )
 import           Data.Time.Clock        (UTCTime, getCurrentTime)
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
-import           Domain.Identifiers     (ActId, actIdPosition)
 
 data Act = Act {
   actId                :: ActId

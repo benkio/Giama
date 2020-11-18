@@ -17,7 +17,7 @@ module Domain.Identifiers (ProjectId
 
 import           Domain.HasName                    (HasName (..))
 
-data ProjectId = MkProjectId String
+newtype ProjectId = MkProjectId String
 data SceneId   = MkSceneId String (String, Int)
 data ActId     = MkActId String (String, Int) (String, Int)
 
