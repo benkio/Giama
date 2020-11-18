@@ -16,7 +16,7 @@ import           Domain.BusinessError               (BusinessError (..))
 import           Domain.HasChild                    (HasChild (..))
 import           Domain.HasName                     (HasName (..), getName)
 import           Domain.Project                     (Project (..))
-import           Domain.Scene                       (Scene (..))
+import           Domain.Scene                       (Scene (..), scenePosition)
 import           Persistence.FileSystem.HasFilePath (getFilePath)
 import           Persistence.FileSystem.Loadable    (loadProject)
 import           System.Directory                   (renameDirectory)
@@ -57,7 +57,7 @@ moveScene sceneToMove position targetProjectId sourceProjectId = E.runExceptT $ 
   return targetProjectId
 
 moveAct :: Act -> Int -> SceneId -> SceneId -> IO (Either BusinessError SceneId)
-moveAct actToMove position targetSceneId sourceSceneId = -- E.runExceptT $ do
+moveAct actToMove position targetSceneId sourceSceneId = undefined -- E.runExceptT $ do
   -- sourceProject <- E.ExceptT (loadProject sourceProjectId)
   -- let followingSourceProjectScenes = (fmap (\s -> ((toFilePath . getFilePath) s, (toFilePath . getFilePath) (s {scenePosition = scenePosition s - 1}))) .
   --                                     filter (\s -> scenePosition s > scenePosition sceneToMove) .

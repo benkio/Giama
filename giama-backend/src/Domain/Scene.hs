@@ -1,5 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
-module Domain.Scene (Scene(..), createEmptyScene, extractAct) where
+module Domain.Scene (Scene(..), createEmptyScene, extractAct, scenePosition, sceneName, sceneProjectId) where
 
 import           Data.List              (find)
 import           Data.Time.Clock        (UTCTime, getCurrentTime)
@@ -8,7 +8,7 @@ import           Domain.BusinessError   (BusinessError (..))
 import           Domain.HasChild        (HasChild (..))
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
-import           Domain.Identifiers     (ActId, ProjectId, SceneId)
+import           Domain.Identifiers     (ActId, ProjectId, SceneId, sceneIdPosition, projectIdFromSceneId)
 import           LanguageExtensions     (maybeToEither)
 
 data Scene = Scene {
@@ -44,4 +44,9 @@ createEmptyScene scnId = getCurrentTime >>= \time ->
   , sceneActs            = []
   }
 
-
+sceneProjectId :: Scene -> String
+sceneProjectId = getName . projectIdFromSceneId . sceneId
+scenePosition :: Scene -> Int
+scenePosition = sceneIdPosition . sceneId
+sceneName :: Scene -> String
+sceneName = getName . sceneId

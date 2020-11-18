@@ -1,9 +1,11 @@
-module Domain.Act (Act(..), createEmptyAct) where
+module Domain.Act (Act(..), createEmptyAct, actPosition, actProjectName , actSceneName , actName , actScenePosition) where
+
+import Domain.Identifiers (projectIdFromActId, sceneIdFromActId, sceneIdPosition, sceneIdFromActId)
 
 import           Data.Time.Clock        (UTCTime, getCurrentTime)
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
-import           Domain.Identifiers     (ActId)
+import           Domain.Identifiers     (ActId, actIdPosition)
 
 data Act = Act {
   actId                :: ActId
@@ -27,3 +29,14 @@ createEmptyAct aId = getCurrentTime >>= \time ->
   , actModifiedDate         = time
   , actContent              = "Empty Act"
   }
+
+actPosition      :: Act -> Int
+actPosition       = actIdPosition .  actId
+actProjectName   :: Act -> String
+actProjectName    = getName . projectIdFromActId . actId
+actSceneName     :: Act -> String
+actSceneName      = getName . sceneIdFromActId . actId
+actName          :: Act -> String
+actName           = getName . actId
+actScenePosition :: Act -> String
+actScenePosition  = show . sceneIdPosition . sceneIdFromActId . actId

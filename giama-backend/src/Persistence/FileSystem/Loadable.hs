@@ -3,13 +3,13 @@ module Persistence.FileSystem.Loadable (Loadable(..), loadProjects, loadProject,
 import           Control.Monad.Trans.Except         (ExceptT (..), except,
                                                      runExceptT)
 import           Data.List                          (find, sortOn)
-import           Domain.Act                         (Act (..))
+import           Domain.Act                         (Act (..), actPosition)
 import           Domain.BusinessError               (BusinessError (..))
 import           Domain.HasName                     (HasName (..))
 import           Domain.Identifiers                 (ActId, ProjectId,
-                                                     SceneId)
+                                                     SceneId, projectIdConstructor, sceneIdConstructor, actIdConstructor)
 import           Domain.Project                     (Project (..))
-import           Domain.Scene                       (Scene (..))
+import           Domain.Scene                       (Scene (..), scenePosition)
 import           LanguageExtensions                 (maybeToEither)
 import           Persistence.FileSystem.Config      (rootPath)
 import           Persistence.FileSystem.HasFilePath (HasFilePath (..))
@@ -35,9 +35,8 @@ instance Loadable Project where
                            do
                              let (sp, sn) = span (/= '_') (toUnrootedFilePath (takeBaseName s))
                              modifiedDate <- getModificationTime s
-                             let projectId = projectIdConstructor (projectId x)
                              load (Scene {
-                                      sceneId            = sceneIdConstructor projectId (tail sn) (read sp :: Int)
+                                      sceneId            = sceneIdConstructor (projectId x) (tail sn) (read sp :: Int)
                                       , sceneModifiedDate    = modifiedDate
                                       ,sceneActs             = []         })) (\ss x -> x { projectScenes = sortOn scenePosition ss}) p
 
@@ -48,13 +47,11 @@ instance Loadable Scene where
             ac <- (readFile . toFilePath) a
             modifiedDate <- getModificationTime a
             let (ap, an) = span (/= '_') (toUnrootedFilePath (takeBaseName a))
+                scnId = sceneId x
+                aId = actIdConstructor scnId (tail an) (read ap :: Int)
             return (Act {
-                       actParentProjectId      = sceneParentProjectId x
-                       , actParentSceneId      = sceneName x
-                       , actParentScenePosition  = scenePosition x
+                       actId                 = aId
                        , actModifiedDate         = modifiedDate
-                       , actPosition             = read ap :: Int
-                       , actName                 = tail an
                        , actContent              = ac
                        })) (\as x -> x { sceneActs = sortOn actPosition as}) s
 
@@ -66,22 +63,22 @@ loadProjects = do
                prjModifiedDate <- getModificationTime p
                let prjName = (toUnrootedFilePath . takeBaseName) p
                load (Project {
-                        projectName = prjName,
-                        projectModifiedDate =
-                        prjModifiedDate, projectScenes = [] })) projectAbsolutePaths
+                        projectId = projectIdConstructor prjName
+                        ,projectModifiedDate = prjModifiedDate
+                        , projectScenes = [] })) projectAbsolutePaths
 
 loadProject :: ProjectId -> IO (Either BusinessError Project)
 loadProject prjName = do
   maybeToEither ProjectNotFound
-       . find (\ p -> getName p == prjName)
+       . find (\ p -> show (getName p) == show prjName)
        <$> loadProjects
 
 loadScene :: ProjectId -> SceneId -> IO (Either BusinessError Scene)
 loadScene prjName scnName = runExceptT $ do
   project <- ExceptT $ loadProject prjName
-  except $ maybeToEither SceneNotFound (find (\s -> getName s == scnName) (projectScenes project))
+  except $ maybeToEither SceneNotFound (find (\s -> show (getName s) == show scnName) (projectScenes project))
 
 loadAct :: ProjectId -> SceneId -> ActId ->  IO (Either BusinessError Act)
 loadAct prjName scnName aName = runExceptT $ do
   scene <- ExceptT $ loadScene prjName scnName
-  except $ maybeToEither ActNotFound (find (\a -> getName a == aName) (sceneActs scene))
+  except $ maybeToEither ActNotFound (find (\a -> show (getName a) == show aName) (sceneActs scene))
