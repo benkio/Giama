@@ -70,14 +70,17 @@ getNewEmptyScene :: IO (Either BusinessError Scene)
 getNewEmptyScene = do
   prjId <- getProjectId
   eitherProject <- loadProject prjId
-  let eitherNewScenePosition = (+1) . scenePosition . maximumBy (\s s' -> compare (scenePosition s) (scenePosition s')) . projectScenes <$> eitherProject
+  let eitherNewScenePosition = fmap (\l -> if null l
+                                      then 0 else ((+1) . scenePosition . maximumBy (\s s' -> compare (scenePosition s) (scenePosition s'))) l) (projectScenes <$> eitherProject)
   srnName <- getSceneName
   (createEmptyScene .  sceneIdConstructor prjId srnName) `traverse` eitherNewScenePosition
 
 getNewEmptyAct :: IO (Either BusinessError Act)
 getNewEmptyAct = do
   eitherScene <- getNewEmptyScene
-  let eitherNewActPosition = (+1) . actPosition . maximumBy (\a a' -> compare (actPosition a) (actPosition a')) . sceneActs <$> eitherScene
+  let eitherNewActPosition = fmap (\l -> if null l then 0 else
+                                      ((+1) . actPosition . maximumBy (\a a' -> compare (actPosition a) (actPosition a'))) l
+                                      ) (sceneActs <$> eitherScene)
   aName <- getActName
   traverse createEmptyAct (liftA2 (\s ap -> actIdConstructor (sceneId s) aName ap) eitherScene eitherNewActPosition)
 

@@ -68,9 +68,9 @@ loadProjects = do
                         , projectScenes = [] })) projectAbsolutePaths
 
 loadProject :: ProjectId -> IO (Either BusinessError Project)
-loadProject prjName = do
+loadProject prjId = do
   maybeToEither ProjectNotFound
-       . find (\ p -> show (getName p) == show prjName)
+       . find (\ p -> getName p == getName prjId)
        <$> loadProjects
 
 loadScene :: SceneId -> IO (Either BusinessError Scene)
