@@ -27,7 +27,8 @@ import           Domain.Identifiers                (ActId, ProjectId,
 import           Domain.Project                    (Project (..),
                                                     createEmptyProject, flatten,
                                                     showElements,
-                                                    showElementsName)
+                                                    showElementsName,
+                                                    extractScene)
 import           Domain.Scene                      (Scene (..),
                                                     createEmptyScene,
                                                     extractAct,
@@ -77,8 +78,11 @@ getNewEmptyScene = do
 
 getNewEmptyAct :: IO (Either BusinessError Act)
 getNewEmptyAct = do
-  eitherScene <- getNewEmptyScene
-  let eitherNewActPosition = fmap (\l -> if null l then 0 else
+  prjId <- getProjectId
+  eitherProject <- loadProject prjId
+  scnName <- getSceneName
+  let eitherScene = (>>=) eitherProject (extractScene scnName)
+      eitherNewActPosition = fmap (\l -> if null l then 0 else
                                       ((+1) . actPosition . maximumBy (\a a' -> compare (actPosition a) (actPosition a'))) l
                                       ) (sceneActs <$> eitherScene)
   aName <- getActName

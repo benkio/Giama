@@ -1,6 +1,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Domain.Project (Project(..), ProjectId, showElements, showElementsName, createEmptyProject, flatten, extractScene) where
 
+import           Domain.Scene                  (Scene (..), scenePosition, sceneName, sceneProjectId)
+
 import           Data.List              (find)
 import           Data.Time.Clock        (UTCTime, getCurrentTime)
 import           Domain.BusinessError   (BusinessError (..))
@@ -22,8 +24,8 @@ instance Show Project where
   show Project { projectId=pn, projectScenes=ps} =
     show pn ++ foldl (\acc s -> acc ++ "\n" ++ show s) "" ps
 
-extractScene :: SceneId -> Project -> Either BusinessError Scene
-extractScene sn = maybeToEither SceneNotFound . find (\s -> show (sceneId s) == show sn) . projectScenes
+extractScene :: String -> Project -> Either BusinessError Scene
+extractScene sn = maybeToEither SceneNotFound . find (\s -> sceneName s == sn) . projectScenes
 
 showElementsPattern :: (a -> String) -> [a]-> String
 showElementsPattern showF = foldl (\acc p-> acc ++ "\n" ++ showF p) ""

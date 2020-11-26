@@ -22,5 +22,5 @@ instance HasFilePath Act where
   getFilePath a =
     rootPath </> fragments [
     actProjectName a,
-    (show . actScenePosition) a ++ "_" ++ actSceneName a,
+    actScenePosition a ++ "_" ++ actSceneName a,
     (show . actPosition) a ++ "_" ++ actName a ++ ".txt"]
