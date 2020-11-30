@@ -11,6 +11,11 @@ module Controller.Router (
   , moveActRoute
   , searchByNameRoute) where
 
+import           Data.Maybe                        (listToMaybe)
+import           Domain.Identifiers                (ProjectId,
+                                                    projectIdFromSceneId,
+                                                    sceneIdPosition)
+
 import           Control.Applicative               (liftA2)
 import           Control.Exception                 (SomeException, try)
 import           Control.Monad.IO.Class            (liftIO)
@@ -19,20 +24,23 @@ import qualified Control.Monad.Trans.Except        as E (ExceptT (..), except,
 import           Data.Bifoldable                   (bifoldMap)
 import           Data.List                         (maximumBy)
 import           Data.Maybe                        (fromMaybe)
-import           Domain.Act                        (Act (..), createEmptyAct, actPosition)
+import           Domain.Act                        (Act (..), actPosition,
+                                                    createEmptyAct)
 import           Domain.BusinessError              (BusinessError)
 import           Domain.HasName                    (HasName (..))
-import           Domain.Identifiers                (ActId, ProjectId,
-                                                    SceneId, projectIdConstructor, sceneIdConstructor, actIdConstructor, sceneIdFromActId)
+import           Domain.Identifiers                (actIdConstructor,
+                                                    projectIdConstructor,
+                                                    sceneIdConstructor,
+                                                    sceneIdFromActId)
 import           Domain.Project                    (Project (..),
-                                                    createEmptyProject, flatten,
+                                                    createEmptyProject,
+                                                    extractScene, flatten,
+                                                    getFollowingScenes,
                                                     showElements,
-                                                    showElementsName,
-                                                    extractScene)
+                                                    showElementsName)
 import           Domain.Scene                      (Scene (..),
                                                     createEmptyScene,
-                                                    extractAct,
-                                                    scenePosition)
+                                                    extractAct, scenePosition)
 import           Domain.Search                     (searchByName)
 import           Domain.Sort                       (sortByModifiedDate)
 import           LanguageExtensions                (readMaybe)
@@ -123,7 +131,11 @@ removeSceneRoute :: IO ()
 removeSceneRoute = do
   eitherSceneRemoved <- E.runExceptT (do
                                        emptyScene <- E.ExceptT getNewEmptyScene
-                                       scene <- E.ExceptT $ loadScene (sceneId emptyScene)
+                                       let scnId = sceneId emptyScene
+                                       project <- E.ExceptT $ loadProject ((projectIdFromSceneId . sceneId) emptyScene)
+                                       scene <- E.ExceptT $ loadScene scnId
+                                       let nextScene = (listToMaybe . getFollowingScenes (sceneIdPosition scnId)) project
+                                       _ <- E.ExceptT $ foldr (\s _ ->  move s (scenePosition s - 1) (projectId project)) (return (Right (projectId project))) nextScene
                                        E.ExceptT (try (remove scene)))
   let result = bifoldMap (\e -> "An error occurred into the scene removal: " ++ show e) (\p -> "Scene " ++ getName p ++ " Removed Successfully!!") eitherSceneRemoved
   putStrLn result

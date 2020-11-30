@@ -3,27 +3,20 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Persistence.FileSystem.Movable where
 
-import Domain.Identifiers
-      ( ActId,
-        ProjectId,
-        SceneId,
-        sceneIdPosition,
-        projectIdFromSceneId,
-        ProjectId,
-        SceneId,
-        sceneIdModifyPosition,
-        sceneIdModifyProject )
 import           Control.Monad.IO.Class             (liftIO)
-import qualified Control.Monad.Trans.Except         as E (ExceptT (..), except,
+import qualified Control.Monad.Trans.Except         as E (ExceptT (..),
                                                           runExceptT)
 import           Data.Foldable                      (traverse_)
-import           Data.List                          (find)
 import           Domain.Act                         (Act (..))
 import           Domain.BusinessError               (BusinessError (..))
 import           Domain.HasChild                    (HasChild (..))
-import           Domain.HasName                     (HasName (..), getName)
+import           Domain.Identifiers                 (ProjectId, SceneId,
+                                                     projectIdFromSceneId,
+                                                     sceneIdModifyPosition,
+                                                     sceneIdModifyProject)
 import           Domain.Project                     (Project (..))
-import           Domain.Scene                       (Scene (..), scenePosition, sceneName)
+import           Domain.Scene                       (Scene (..), sceneName,
+                                                     scenePosition)
 import           Persistence.FileSystem.HasFilePath (getFilePath)
 import           Persistence.FileSystem.Loadable    (loadProject)
 import           System.Directory                   (renameDirectory)

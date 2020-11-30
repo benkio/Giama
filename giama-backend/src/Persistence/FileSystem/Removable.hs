@@ -2,6 +2,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Persistence.FileSystem.Removable (Removable(..)) where
 
+import           Persistence.FileSystem.Movable            (Movable (..))
+
 import           Domain.Act                                (Act (..))
 import           Domain.Project                            (Project (..))
 import           Domain.Scene                              (Scene (..))

@@ -8,13 +8,14 @@ import           Domain.BusinessError   (BusinessError (..))
 import           Domain.HasChild        (HasChild (..))
 import           Domain.HasModifiedDate (HasModifiedDate (..))
 import           Domain.HasName         (HasName (..))
-import           Domain.Identifiers     (ActId, ProjectId, SceneId, sceneIdPosition, projectIdFromSceneId)
+import           Domain.Identifiers     (ActId, SceneId, projectIdFromSceneId,
+                                         sceneIdPosition)
 import           LanguageExtensions     (maybeToEither)
 
 data Scene = Scene {
-  sceneId            :: SceneId
-  , sceneModifiedDate    :: UTCTime
-  , sceneActs            :: [Act]
+  sceneId             :: SceneId
+  , sceneModifiedDate :: UTCTime
+  , sceneActs         :: [Act]
   }
 
 instance Show Scene where
